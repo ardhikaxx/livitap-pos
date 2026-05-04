@@ -70,13 +70,74 @@
                     Kembalian: Rp <span x-text="changeAmount.toLocaleString()"></span>
                 </div>
                 
-                <form action="{{ route('pos.store') }}" method="POST" class="space-y-3">
-                    @csrf
-                    <input type="hidden" name="outlet_id" value="1">
-                    <input type="hidden" name="items" :value="JSON.stringify(cart)">
-                    <input type="hidden" name="paid_amount" :value="paidAmount">
-                    <button type="submit" class="w-full bg-green-600 p-3 rounded font-bold hover:bg-green-700" :disabled="cart.length === 0 || paidAmount < total">BAYAR</button>
-                </form>
+                <button @click="showReceiptModal = true" class="w-full bg-green-600 p-3 rounded font-bold hover:bg-green-700" :disabled="cart.length === 0 || paidAmount < total">BAYAR</button>
+            </div>
+        </div>
+
+        <!-- Receipt Modal -->
+        <div x-show="showReceiptModal" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white text-black rounded-lg p-6 w-full max-w-md mx-4">
+                <div id="receipt-content">
+                    <div class="text-center mb-4">
+                        <h2 class="font-bold text-lg">LIVITAP POS</h2>
+                        <p class="text-sm">Jl. Sudirman No. 123, Jakarta</p>
+                    </div>
+                    
+                    <div class="border-t border-b py-2 mb-2">
+                        <div class="flex justify-between text-sm">
+                            <span>No. Struk:</span>
+                            <span x-text="receiptData.invoice"></span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span>Tanggal:</span>
+                            <span x-text="receiptData.date"></span>
+                        </div>
+                    </div>
+                    
+                    <table class="w-full text-sm mb-4">
+                        <thead>
+                            <tr class="border-b">
+                                <th class="text-left">Item</th>
+                                <th class="text-right">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template x-for="item in cart" :key="item.id">
+                                <tr>
+                                    <td>
+                                        <span x-text="item.name"></span><br>
+                                        <span class="text-xs"><span x-text="item.qty"></span> x Rp <span x-text="item.price.toLocaleString()"></span></span>
+                                    </td>
+                                    <td class="text-right">Rp <span x-text="(item.price * item.qty).toLocaleString()"></span></td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                    
+                    <div class="border-t pt-2">
+                        <div class="flex justify-between font-bold">
+                            <span>Total:</span>
+                            <span>Rp <span x-text="total.toLocaleString()"></span></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Bayar:</span>
+                            <span>Rp <span x-text="paidAmount.toLocaleString()"></span></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Kembali:</span>
+                            <span>Rp <span x-text="changeAmount.toLocaleString()"></span></span>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4 text-xs">
+                        <p>Terima kasih atas kunjungan Anda!</p>
+                    </div>
+                </div>
+                
+                <div class="flex space-x-2 mt-4">
+                    <button @click="printReceipt" class="flex-1 bg-blue-600 text-white py-2 rounded">Print</button>
+                    <button @click="newTransaction" class="flex-1 bg-gray-600 text-white py-2 rounded">Transaksi Baru</button>
+                </div>
             </div>
         </div>
     </div>
@@ -90,6 +151,11 @@
                 total: 0,
                 paidAmount: 0,
                 changeAmount: 0,
+                showReceiptModal: false,
+                receiptData: {
+                    invoice: 'INV-' + new Date().toISOString().slice(11,19).replace(/:/g,''),
+                    date: new Date().toLocaleString('id-ID')
+                },
                 
                 addToCart(id, name, price) {
                     const existing = this.cart.find(i => i.id === id);
@@ -112,9 +178,31 @@
                 
                 calculateChange() {
                     this.changeAmount = Math.max(0, this.paidAmount - this.total);
+                },
+                
+                printReceipt() {
+                    const printContent = document.getElementById('receipt-content').innerHTML;
+                    const win = window.open('', '', 'width=300,height=600');
+                    win.document.write('<html><head><title>Print Struk</title><script src="https://cdn.tailwindcss.com"><\/script></head><body>' + printContent + '</body></html>');
+                    win.document.close();
+                    win.focus();
+                    win.print();
+                    win.close();
+                },
+                
+                newTransaction() {
+                    this.cart = [];
+                    this.paidAmount = 0;
+                    this.changeAmount = 0;
+                    this.total = 0;
+                    this.showReceiptModal = false;
                 }
             }
         }
     </script>
+    
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
 </body>
 </html>

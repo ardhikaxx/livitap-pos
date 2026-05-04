@@ -13,6 +13,7 @@ Route::get('/', function () {
 Route::middleware('auth')->group(function () {
     Route::get('/pos', [DashboardController::class, 'index'])->name('pos.index');
     Route::post('/pos', [SaleController::class, 'store'])->name('pos.store');
+    Route::get('/pos/{sale}/receipt', [SaleController::class, 'receipt'])->name('pos.receipt');
     
     Route::resource('products', ProductController::class)->except(['show']);
     

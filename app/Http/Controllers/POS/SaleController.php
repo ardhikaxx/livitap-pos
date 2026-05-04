@@ -14,9 +14,15 @@ class SaleController extends Controller
     {
         try {
             $sale = $this->saleService->createSale($request->validated(), auth()->user());
-            return redirect()->route('pos.index')->with('success', 'Transaksi berhasil disimpan. No: ' . $sale->invoice_number);
+            return redirect()->route('pos.receipt', $sale->id)->with('success', 'Transaksi berhasil disimpan');
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
+    }
+
+    public function receipt($id)
+    {
+        $sale = \App\Models\Sale::with(['items.product', 'user', 'outlet.business'])->findOrFail($id);
+        return view('pos.receipt', compact('sale'));
     }
 }

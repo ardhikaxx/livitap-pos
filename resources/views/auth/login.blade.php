@@ -18,9 +18,14 @@
                 <label class="block text-gray-700 mb-2">Email</label>
                 <input type="email" name="email" class="w-full p-3 border rounded" required>
             </div>
-            <div class="mb-4">
+            <div class="mb-4" x-data="{ showPassword: false }">
                 <label class="block text-gray-700 mb-2">Password</label>
-                <input type="password" name="password" class="w-full p-3 border rounded" required>
+                <div class="relative">
+                    <input :type="showPassword ? 'text' : 'password'" name="password" class="w-full p-3 border rounded pr-12" required>
+                    <button type="button" @click="showPassword = !showPassword" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                        <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                    </button>
+                </div>
             </div>
             <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700">Login</button>
         </form>
@@ -31,3 +36,7 @@
     </div>
 </div>
 @endsection
+
+@push('styles')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+@endpush

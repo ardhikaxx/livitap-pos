@@ -49,8 +49,8 @@ Route::middleware(['auth', 'check.business', 'set.outlet'])->group(function () {
     Route::get('/shifts/{shift}', [ShiftController::class, 'show'])->name('shifts.show');
     Route::get('/shifts/{shift}/report', [ShiftController::class, 'report'])->name('shifts.report');
 
-    // Products Management
-    Route::resource('products', ProductController::class)->except(['show']);
+// Products Management
+        Route::resource('products', ProductController::class);
     Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
     Route::post('/products/import', [ProductController::class, 'import'])->name('products.import');
 

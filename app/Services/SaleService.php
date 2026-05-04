@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Sale;
 use App\Models\SaleItem;
+use App\Models\Product;
 use App\Models\ProductStock;
 use App\Models\StockMovement;
 use App\Models\Shift;
@@ -14,8 +15,8 @@ use App\Services\DiscountService;
 use App\Services\PaymentService;
 use App\Services\PointService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
-use Carbon\Carbon;
 use Carbon\Carbon;
 
 class SaleService
@@ -183,8 +184,16 @@ class SaleService
         // Cek shift policy
         $shift = $sale->shift;
         if ($shift && $shift->status !== 'open') {
-            // Only manager/owner can void closed shift
-            if (!auth()->user()->hasRole('manager|owner|super-admin')) {
+            if (!Auth::check()) {
+                throw new \Exception("Hanya Manager/Owner yang bisa void transaksi di shift yang sudah tutup");
+            }
+
+            $user = Auth::user();
+            
+            // Bypass Spatie trait methods and use direct relationship
+            $hasPermission = $user->roles()->whereIn('name', ['manager', 'owner', 'super-admin', 'Owner'])->exists();
+            
+            if (!$hasPermission) {
                 throw new \Exception("Hanya Manager/Owner yang bisa void transaksi di shift yang sudah tutup");
             }
         }

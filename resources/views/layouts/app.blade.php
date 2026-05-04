@@ -7,37 +7,37 @@
 
     <title>{{ config('app.name', 'LIVITAP POS') }}</title>
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunphp.net">
-    <link href="https://fonts.bunphp.net/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
     @stack('styles')
 </head>
-<body class="font-sans antialiased bg-gray-100">
-    <div class="min-h-screen">
-        @include('partials.navbar')
+<body class="bg-light">
+    
+    @include('partials.navbar')
         
-        <main class="py-10">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                @if (session('success'))
-                    <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
-                        {{ session('success') }}
-                    </div>
-                @endif
+    <main class="py-4">
+        <div class="container-fluid">
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+            
+            @if (session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+            
+            @yield('content')
+        </div>
+    </main>
 
-                @if (session('error'))
-                    <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-                        {{ session('error') }}
-                    </div>
-                @endif
-
-                @yield('content')
-            </div>
-        </main>
-    </div>
-
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     @stack('scripts')
 </body>
 </html>

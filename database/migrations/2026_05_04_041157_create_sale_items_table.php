@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignUuid('sale_id')->constrained()->onDelete('cascade');
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
-            $table->foreignId('variant_id')->nullable()->constrained('product_variants')->onDelete('set null');
+            $table->unsignedBigInteger('variant_id')->nullable();
             $table->string('name_snapshot');
             $table->string('sku_snapshot')->nullable();
             $table->decimal('qty', 15, 2);

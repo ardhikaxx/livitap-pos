@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('sales', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('outlet_id')->constrained()->onDelete('cascade');
-            $table->foreignUuid('user_id')->constrained()->onDelete('cascade');
-            $table->foreignUuid('customer_id')->nullable()->constrained()->onDelete('set null');
-            $table->foreignUuid('shift_id')->nullable()->constrained()->onDelete('set null');
-            $table->foreignUuid('table_id')->nullable()->constrained()->onDelete('set null');
+            $table->unsignedBigInteger('outlet_id');
+            $table->uuid('user_id');
+            $table->unsignedBigInteger('customer_id')->nullable();
+            $table->unsignedBigInteger('shift_id')->nullable();
+            $table->unsignedBigInteger('table_id')->nullable();
             $table->string('invoice_number')->unique();
             $table->enum('type', ['sale', 'refund'])->default('sale');
             $table->enum('status', ['paid', 'partial', 'unpaid', 'void'])->default('paid');

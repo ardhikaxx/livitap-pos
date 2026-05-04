@@ -1,47 +1,31 @@
-<nav class="bg-white shadow-md">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex items-center">
-                <a href="{{ route('pos.index') }}" class="text-xl font-bold text-blue-600">
-                    LIVITAP POS
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm mb-4">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="{{ route('pos.index') }}">LIVITAP POS</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" href="{{ route('pos.index') }}">POS</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ route('products.index') }}">Produk</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ route('stocks.index') }}">Stok</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ route('reports.sales') }}">Laporan</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ route('settings.business') }}">Pengaturan</a></li>
+            </ul>
+            <div class="d-flex dropdown">
+                <a class="nav-link dropdown-toggle text-white" href="#" data-bs-toggle="dropdown">
+                    {{ auth()->user()->name ?? 'User' }}
                 </a>
-                
-                <div class="ml-10 flex items-baseline space-x-4">
-                    <a href="{{ route('pos.index') }}" class="text-gray-600 hover:text-gray-900 px-3 py-2">
-                        POS
-                    </a>
-                    <a href="{{ route('products.index') }}" class="text-gray-600 hover:text-gray-900 px-3 py-2">
-                        Produk
-                    </a>
-                    <a href="{{ route('stocks.index') }}" class="text-gray-600 hover:text-gray-900 px-3 py-2">
-                        Stok
-                    </a>
-                    <a href="{{ route('reports.sales') }}" class="text-gray-600 hover:text-gray-900 px-3 py-2">
-                        Laporan
-                    </a>
-                    <a href="{{ route('settings.business') }}" class="text-gray-600 hover:text-gray-900 px-3 py-2">
-                        Pengaturan
-                    </a>
-                </div>
-            </div>
-
-            <div class="flex items-center">
-                <div class="relative">
-                    <span class="text-gray-700">
-                        {{ auth()->user()->name }}
-                    </span>
-                    <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
-                        <a href="{{ route('settings.business') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            Profil
-                        </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="{{ route('settings.business') }}">Profil</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                Logout
-                            </button>
+                            <button type="submit" class="dropdown-item text-danger">Logout</button>
                         </form>
-                    </div>
-                </div>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>

@@ -42,8 +42,4 @@ class Shift extends Model
         return $this->hasMany(CashFlow::class);
     }
 
-    public function sales(): HasMany
-    {
-        return $this->hasMany(Sale::class);
-    }
 }

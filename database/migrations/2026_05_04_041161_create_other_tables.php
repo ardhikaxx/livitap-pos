@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
             $table->foreignId('outlet_id')->constrained()->onDelete('cascade');
-            $table->foreignId('variant_id')->nullable()->constrained('product_variants')->onDelete('set null');
+            $table->unsignedBigInteger('variant_id')->nullable();
             $table->enum('type', ['purchase', 'sale', 'adjustment', 'transfer', 'opname', 'return']);
             $table->string('reference_type')->nullable();
             $table->unsignedBigInteger('reference_id')->nullable();
@@ -50,7 +50,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('discount_id')->constrained()->onDelete('cascade');
             $table->string('code')->unique();
-            $table->foreignId('used_by')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignUuid('used_by')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamp('used_at')->nullable();
             $table->timestamp('expires_at')->nullable();
             $table->boolean('is_active')->default(true);

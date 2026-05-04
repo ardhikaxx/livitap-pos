@@ -193,5 +193,10 @@ return [
         // Settings
         'manage-settings' => 'Kelola Pengaturan',
         'manage-discounts' => 'Kelola Diskon',
+        
+        // Customers
+        'create-customer' => 'Tambah Pelanggan',
+        'edit-customer' => 'Edit Pelanggan',
+        'delete-customer' => 'Hapus Pelanggan',
     ],
 ];

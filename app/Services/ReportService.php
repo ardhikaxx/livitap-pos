@@ -28,21 +28,31 @@ class ReportService
             $query->where('user_id', $userId);
         }
 
-        $sales = $query->orderBy('sale_date', 'desc')->get();
+        $sales = $query->orderBy('sale_date', 'desc')->paginate(20)->appends(request()->except('page'));
         
-        $totalSales = $sales->sum('total');
-        $totalItems = $sales->sum(function ($sale) {
+        $summaryQuery = Sale::whereBetween('sale_date', [$from, $to])
+            ->where('status', 'paid');
+        if ($outletId) {
+            $summaryQuery->where('outlet_id', $outletId);
+        }
+        if ($userId) {
+            $summaryQuery->where('user_id', $userId);
+        }
+        $allSales = $summaryQuery->with('items')->get();
+        
+        $totalSales = $allSales->sum('total');
+        $totalItems = $allSales->sum(function ($sale) {
             return $sale->items->sum('qty');
         });
 
-        $paymentMethods = $sales->flatMap->payments()
+        $paymentMethods = $allSales->flatMap->payments()
             ->groupBy('method')
             ->map(function ($payments) {
                 return $payments->sum('amount');
             });
 
         $topProducts = SaleItem::select('product_id', DB::raw('SUM(qty) as total_qty'), DB::raw('SUM(subtotal) as total_sales'))
-            ->whereIn('sale_id', $sales->pluck('id'))
+            ->whereIn('sale_id', $allSales->pluck('id'))
             ->groupBy('product_id')
             ->orderByDesc('total_qty')
             ->limit(10)

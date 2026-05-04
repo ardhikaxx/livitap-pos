@@ -51,7 +51,7 @@ return new class extends Migration
 
         Schema::create('activity_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignUuid('user_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('business_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('outlet_id')->nullable()->constrained()->nullOnDelete();
             $table->string('action');
@@ -72,8 +72,8 @@ return new class extends Migration
             $table->foreignId('outlet_id')->constrained()->onDelete('cascade');
             $table->enum('status', ['open', 'closed'])->default('open');
             $table->text('notes')->nullable();
-            $table->foreignId('opened_by')->constrained('users')->onDelete('cascade');
-            $table->foreignId('closed_by')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignUuid('opened_by')->constrained('users')->onDelete('cascade');
+            $table->foreignUuid('closed_by')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamp('opened_at');
             $table->timestamp('closed_at')->nullable();
             $table->timestamps();

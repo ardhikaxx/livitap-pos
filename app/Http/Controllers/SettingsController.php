@@ -13,9 +13,9 @@ class SettingsController extends Controller
      */
     public function business()
     {
-        $businesses = auth()->user()->businesses;
+        $businesses = auth()->user()->businesses ?? collect();
         $currentBusiness = Business::find(session('business_id')) 
-            ?? auth()->user()->businesses->first();
+            ?? $businesses->first();
 
         return view('settings.business', compact('businesses', 'currentBusiness'));
     }

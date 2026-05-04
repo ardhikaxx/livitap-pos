@@ -1,6 +1,5 @@
 # LIVITAP POS — Rules & Specification
 > **Laravel 12 · Multi-Tenant · Multi-Role · Universal Point of Sale System**
-> Versi: 1.0.0 | Terakhir diperbarui: 2025
 
 ---
 
@@ -960,15 +959,24 @@ PATCH  /kitchen/orders/{id}/status
 
 ---
 
-## 10. UI/UX GUIDELINES
+## 10. UI/UX Guidelines
 
-### Layout Utama
+### Blade Templating & Layouts
 
-```
-Sidebar kiri : Navigasi modul (collapsible di mobile)
-Header       : Nama outlet aktif, user, notifikasi, tombol buka POS
-Content Area : Konten utama
-```
+Sistem menggunakan struktur layout (`resources/views/layouts/app.blade.php`) dengan sistem partials untuk menjaga modularitas.
+
+- **Layout Base:** Gunakan `@yield` untuk konten utama.
+- **Stacks:**
+    - `@stack('styles')` dan `@stack('scripts')` wajib ada di `layouts/app.blade.php` untuk menangani asset spesifik per halaman.
+    - Setiap file page wajib menggunakan `@push('styles')` untuk CSS tambahan dan `@push('scripts')` untuk JS tambahan.
+
+### Komponen & Partials
+
+- **Partials:** Letakkan di `resources/views/partials/` (header, footer, sidebar, modal).
+- **Global Assets:** Untuk CSS/JS yang terhubung pada semua halaman, gunakan:
+    - `@vite(['resources/css/app.css', 'resources/js/app.js'])` di dalam head/body layout utama.
+- **Dynamic Assets:** Jika membutuhkan penanganan asset eksternal/khusus (seperti pusher atau external handler), gunakan pusher broadcasting setup dan handler stack yang relevan dalam stack directives tersebut.
+
 
 ### POS Interface
 

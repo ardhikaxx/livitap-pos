@@ -3,8 +3,64 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Sale extends Model
 {
-    //
+    protected $fillable = [
+        'outlet_id', 'user_id', 'customer_id', 'invoice_number', 'type', 'status',
+        'sale_date', 'subtotal', 'discount_amount', 'tax_amount', 'total',
+        'paid_amount', 'change_amount', 'notes', 'table_id', 'order_type', 'shift_id'
+    ];
+
+    protected $casts = [
+        'sale_date' => 'datetime',
+        'subtotal' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
+        'tax_amount' => 'decimal:2',
+        'total' => 'decimal:2',
+        'paid_amount' => 'decimal:2',
+        'change_amount' => 'decimal:2',
+    ];
+
+    public function outlet(): BelongsTo
+    {
+        return $this->belongsTo(Outlet::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function customer(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class);
+    }
+
+    public function items(): HasMany
+    {
+        return $this->hasMany(SaleItem::class);
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(SalePayment::class);
+    }
+
+    public function shift(): BelongsTo
+    {
+        return $this->belongsTo(Shift::class);
+    }
+
+    public function table(): BelongsTo
+    {
+        return $this->belongsTo(Table::class);
+    }
+
+    public function scopeInPeriod($query, $from, $to)
+    {
+        return $query->whereBetween('sale_date', [$from, $to]);
+    }
 }

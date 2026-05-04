@@ -32,8 +32,18 @@ class Shift extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function sales(): HasMany
+    {
+        return $this->hasMany(Sale::class);
+    }
+
     public function cashFlows(): HasMany
     {
         return $this->hasMany(CashFlow::class);
+    }
+
+    public function sales(): HasMany
+    {
+        return $this->hasMany(Sale::class);
     }
 }

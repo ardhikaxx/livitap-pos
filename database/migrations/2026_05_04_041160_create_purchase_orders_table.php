@@ -22,9 +22,51 @@ return new class extends Migration
             $table->decimal('discount', 15, 2)->default(0);
             $table->decimal('tax', 15, 2)->default(0);
             $table->decimal('total', 15, 2)->default(0);
-            $table->foreignId('approved_by')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignUuid('approved_by')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamp('approved_at')->nullable();
-            $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
+            $table->foreignUuid('created_by')->constrained('users')->onDelete('cascade');
+            $table->timestamps();
+        });
+
+        Schema::create('purchase_order_items', function (Blueprint $table) {
+            $table->id();
+            $table->foreignUuid('purchase_order_id')->constrained()->onDelete('cascade');
+            $table->foreignId('product_id')->constrained()->onDelete('cascade');
+            $table->foreignUuid('variant_id')->nullable()->constrained('product_variants')->onDelete('set null');
+            $table->decimal('qty_ordered', 15, 4);
+            $table->decimal('qty_received', 15, 4)->default(0);
+            $table->string('unit')->default('pcs');
+            $table->decimal('buy_price', 15, 2);
+            $table->decimal('subtotal', 15, 2);
+            $table->text('notes')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('purchase_order_items', function (Blueprint $table) {
+            $table->id();
+            $table->foreignUuid('purchase_order_id')->constrained()->onDelete('cascade');
+            $table->foreignId('product_id')->constrained()->onDelete('cascade');
+            $table->foreignUuid('variant_id')->nullable()->constrained('product_variants')->onDelete('set null');
+            $table->decimal('qty_ordered', 15, 4);
+            $table->decimal('qty_received', 15, 4)->default(0);
+            $table->string('unit')->default('pcs');
+            $table->decimal('buy_price', 15, 2);
+            $table->decimal('subtotal', 15, 2);
+            $table->text('notes')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('purchase_order_items', function (Blueprint $table) {
+            $table->id();
+            $table->foreignUuid('purchase_order_id')->constrained()->onDelete('cascade');
+            $table->foreignId('product_id')->constrained()->onDelete('cascade');
+            $table->foreignUuid('variant_id')->nullable()->constrained('product_variants')->onDelete('set null');
+            $table->decimal('qty_ordered', 15, 4);
+            $table->decimal('qty_received', 15, 4)->default(0);
+            $table->string('unit')->default('pcs');
+            $table->decimal('buy_price', 15, 2);
+            $table->decimal('subtotal', 15, 2);
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
 
@@ -32,8 +74,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('purchase_order_id')->constrained()->onDelete('cascade');
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
-            $table->decimal('qty_ordered', 15, 2);
-            $table->decimal('qty_received', 15, 2)->default(0);
+            $table->foreignUuid('variant_id')->nullable()->constrained('product_variants')->onDelete('set null');
+            $table->decimal('qty_ordered', 15, 4);
+            $table->decimal('qty_received', 15, 4)->default(0);
             $table->string('unit')->default('pcs');
             $table->decimal('buy_price', 15, 2);
             $table->decimal('subtotal', 15, 2);

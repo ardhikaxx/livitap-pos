@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
             $table->foreignId('outlet_id')->constrained()->onDelete('cascade');
+            $table->foreignId('variant_id')->nullable()->constrained('product_variants')->onDelete('set null');
             $table->enum('type', ['purchase', 'sale', 'adjustment', 'transfer', 'opname', 'return']);
             $table->string('reference_type')->nullable();
             $table->unsignedBigInteger('reference_id')->nullable();
@@ -19,10 +20,11 @@ return new class extends Migration
             $table->decimal('qty_change', 15, 2);
             $table->decimal('qty_after', 15, 2);
             $table->text('notes')->nullable();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignUuid('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
 
             $table->index(['reference_type', 'reference_id']);
+            $table->index(['product_id', 'outlet_id']);
         });
 
         Schema::create('discounts', function (Blueprint $table) {
@@ -61,11 +63,13 @@ return new class extends Migration
             $table->string('name');
             $table->integer('capacity')->default(4);
             $table->string('area')->nullable();
-            $table->string('qr_code')->nullable();
+            $table->string('qr_code')->nullable()->unique();
             $table->enum('status', ['empty', 'occupied', 'reserved', 'requesting_bill'])->default('empty');
             $table->uuid('current_sale_id')->nullable();
             $table->integer('sort_order')->default(0);
             $table->timestamps();
+
+            $table->foreign('current_sale_id')->references('id')->on('sales')->onDelete('set null');
         });
 
         Schema::create('kitchen_orders', function (Blueprint $table) {
@@ -82,7 +86,7 @@ return new class extends Migration
 
         Schema::create('outlet_user', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignUuid('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('outlet_id')->constrained()->onDelete('cascade');
             $table->boolean('is_primary')->default(false);
             $table->timestamps();

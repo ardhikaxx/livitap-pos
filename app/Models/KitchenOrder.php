@@ -26,4 +26,9 @@ class KitchenOrder extends Model
     {
         return $this->belongsTo(Table::class);
     }
+
+    public function items(): HasMany
+    {
+        return $this->hasMany(KitchenOrderItem::class);
+    }
 }

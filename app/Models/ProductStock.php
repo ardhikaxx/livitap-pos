@@ -26,4 +26,9 @@ class ProductStock extends Model
     {
         return $this->belongsTo(Outlet::class);
     }
+
+    public function variant(): BelongsTo
+    {
+        return $this->belongsTo(ProductVariant::class);
+    }
 }

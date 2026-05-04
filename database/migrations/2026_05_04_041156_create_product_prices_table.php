@@ -17,7 +17,10 @@ return new class extends Migration
             $table->foreignId('outlet_id')->constrained()->onDelete('cascade');
             $table->decimal('buy_price', 15, 2);
             $table->decimal('sell_price', 15, 2);
+            $table->decimal('min_price', 15, 2)->nullable();
             $table->timestamps();
+
+            $table->unique(['product_id', 'outlet_id']);
         });
     }
 

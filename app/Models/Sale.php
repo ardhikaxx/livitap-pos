@@ -5,9 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class Sale extends Model
 {
+    use SoftDeletes, HasUuids;
+    use SoftDeletes, HasUuids;
+
     protected $fillable = [
         'outlet_id', 'user_id', 'customer_id', 'invoice_number', 'type', 'status',
         'sale_date', 'subtotal', 'discount_amount', 'tax_amount', 'total',
@@ -59,8 +64,23 @@ class Sale extends Model
         return $this->belongsTo(Table::class);
     }
 
+    public function scopeForOutlet($query, $outletId)
+    {
+        return $query->where('outlet_id', $outletId);
+    }
+
     public function scopeInPeriod($query, $from, $to)
     {
         return $query->whereBetween('sale_date', [$from, $to]);
+    }
+
+    public function scopePaid($query)
+    {
+        return $query->where('status', 'paid');
+    }
+
+    public function scopeVoided($query)
+    {
+        return $query->where('status', 'void');
     }
 }

@@ -18,16 +18,21 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->unique();
             $table->string('sku')->unique();
-            $table->string('barcode')->nullable();
+            $table->string('barcode')->nullable()->unique();
             $table->text('description')->nullable();
             $table->string('unit')->default('pcs');
             $table->boolean('track_stock')->default(true);
             $table->boolean('has_variant')->default(false);
+            $table->boolean('is_composite')->default(false);
             $table->string('photo')->nullable();
             $table->boolean('is_active')->default(true);
             $table->boolean('is_pos_visible')->default(true);
+            $table->boolean('is_favorite')->default(false);
             $table->timestamps();
             $table->softDeletes();
+
+            $table->index(['business_id', 'is_active']);
+            $table->index('sku');
         });
     }
 

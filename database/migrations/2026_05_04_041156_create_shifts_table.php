@@ -13,14 +13,20 @@ return new class extends Migration
     {
         Schema::create('shifts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('outlet_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->enum('status', ['open', 'closed'])->default('open');
+            $table->foreignUuid('outlet_id')->constrained()->onDelete('cascade');
+            $table->foreignUuid('user_id')->constrained()->onDelete('cascade');
+            $table->enum('status', ['open', 'closed', 'forced_closed'])->default('open');
             $table->timestamp('opened_at');
             $table->timestamp('closed_at')->nullable();
             $table->decimal('opening_cash', 15, 2);
             $table->decimal('closing_cash', 15, 2)->nullable();
+            $table->decimal('expected_cash', 15, 2)->nullable();
+            $table->decimal('difference', 15, 2)->nullable();
+            $table->text('notes')->nullable();
             $table->timestamps();
+
+            $table->index(['outlet_id', 'status']);
+            $table->index('user_id');
         });
     }
 

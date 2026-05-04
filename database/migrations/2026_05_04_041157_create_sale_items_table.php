@@ -15,11 +15,19 @@ return new class extends Migration
             $table->id();
             $table->foreignUuid('sale_id')->constrained()->onDelete('cascade');
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
+            $table->foreignId('variant_id')->nullable()->constrained('product_variants')->onDelete('set null');
             $table->string('name_snapshot');
+            $table->string('sku_snapshot')->nullable();
             $table->decimal('qty', 15, 2);
             $table->decimal('unit_price', 15, 2);
+            $table->decimal('discount_amount', 15, 2)->default(0);
+            $table->decimal('tax_amount', 15, 2)->default(0);
             $table->decimal('subtotal', 15, 2);
+            $table->decimal('buy_price', 15, 2)->default(0);
+            $table->text('notes')->nullable();
             $table->timestamps();
+
+            $table->index(['sale_id', 'product_id']);
         });
     }
 

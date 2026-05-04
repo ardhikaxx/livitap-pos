@@ -1,27 +1,107 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\POS\SaleController;
 use App\Http\Controllers\POS\DashboardController;
+use App\Http\Controllers\POS\SaleController;
+use App\Http\Controllers\POS\ShiftController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\DiscountController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\StockController;
+use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\TableController;
+use App\Http\Controllers\KitchenController;
+use App\Http\Controllers\CashController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\AuthController;
 
 Route::get('/', function () {
     return redirect()->route('pos.index');
-});
+})->name('home');
 
-Route::middleware('auth')->group(function () {
+// Auth Routes
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [LoginController::class, 'login']);
+Route::post('/logout', function () {
+    auth()->logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect('/login');
+})->name('logout');
+
+// Protected Routes
+Route::middleware(['auth', 'check.business', 'set.outlet'])->group(function () {
+
+    // Dashboard / POS
     Route::get('/pos', [DashboardController::class, 'index'])->name('pos.index');
     Route::post('/pos', [SaleController::class, 'store'])->name('pos.store');
     Route::get('/pos/{sale}/receipt', [SaleController::class, 'receipt'])->name('pos.receipt');
-    
-    Route::resource('products', ProductController::class)->except(['show']);
-    
-    Route::post('/logout', function () {
-        auth()->logout();
-        return redirect('/');
-    })->name('logout');
-});
+    Route::post('/pos/sale/{sale}/void', [SaleController::class, 'void'])->name('pos.void');
+    Route::post('/pos/hold', [SaleController::class, 'hold'])->name('pos.hold');
+    Route::get('/pos/holds', [SaleController::class, 'holds'])->name('pos.holds');
+    Route::post('/pos/cart/calculate', [SaleController::class, 'calculateCart'])->name('pos.calculate');
 
-Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [LoginController::class, 'login']);
+    // Shift Management
+    Route::post('/shifts/open', [ShiftController::class, 'open'])->name('shifts.open');
+    Route::get('/shifts/active', [ShiftController::class, 'active'])->name('shifts.active');
+    Route::post('/shifts/{shift}/close', [ShiftController::class, 'close'])->name('shifts.close');
+    Route::get('/shifts/{shift}', [ShiftController::class, 'show'])->name('shifts.show');
+    Route::get('/shifts/{shift}/report', [ShiftController::class, 'report'])->name('shifts.report');
+
+    // Products Management
+    Route::resource('products', ProductController::class)->except(['show']);
+    Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
+    Route::post('/products/import', [ProductController::class, 'import'])->name('products.import');
+
+    // Stock Management
+    Route::get('/stocks', [StockController::class, 'index'])->name('stocks.index');
+    Route::get('/stocks/{product}/adjust', [StockController::class, 'adjust'])->name('stocks.adjust');
+    Route::post('/stocks/{product}/update', [StockController::class, 'updateStock'])->name('stocks.update');
+    Route::post('/stocks/adjustment', [StockController::class, 'adjustStock'])->name('stocks.adjustment');
+    Route::post('/stocks/transfer', [StockController::class, 'transferStock'])->name('stocks.transfer');
+    Route::post('/stocks/opname', [StockController::class, 'opname'])->name('stocks.opname');
+    Route::post('/stocks/opname/{opname}/close', [StockController::class, 'closeOpname'])->name('stocks.closeOpname');
+
+    // Customer Management
+    Route::resource('customers', CustomerController::class);
+    Route::get('/customers/{customer}/transactions', [CustomerController::class, 'transactions'])->name('customers.transactions');
+    Route::get('/customers/{customer}/points', [CustomerController::class, 'points'])->name('customers.points');
+
+    // Reports
+    Route::get('/reports/sales', [ReportController::class, 'sales'])->name('reports.sales');
+    Route::get('/reports/products', [ReportController::class, 'products'])->name('reports.products');
+    Route::get('/reports/stock', [ReportController::class, 'stock'])->name('reports.stock');
+    Route::get('/reports/cashier', [ReportController::class, 'cashier'])->name('reports.cashier');
+    Route::get('/reports/shift/{shift}', [ReportController::class, 'shift'])->name('reports.shift');
+    Route::post('/reports/export', [ReportController::class, 'export'])->name('reports.export');
+
+    // Discounts & Vouchers
+    Route::resource('discounts', DiscountController::class);
+    Route::post('/discounts/validate-voucher', [DiscountController::class, 'validateVoucher'])->name('discounts.validateVoucher');
+
+    // Settings
+    Route::prefix('settings')->name('settings.')->group(function () {
+        Route::get('/business', [SettingsController::class, 'business'])->name('business');
+        Route::put('/business', [SettingsController::class, 'updateBusiness'])->name('business.update');
+        Route::get('/outlet', [SettingsController::class, 'outlet'])->name('outlet');
+        Route::put('/outlet', [SettingsController::class, 'updateOutlet'])->name('outlet.update');
+        Route::get('/receipt', [SettingsController::class, 'receipt'])->name('receipt');
+        Route::put('/receipt', [SettingsController::class, 'updateReceipt'])->name('receipt.update');
+    });
+
+    // F&B - Table Management
+    Route::get('/tables', [TableController::class, 'index'])->name('tables.index');
+    Route::patch('/tables/{table}/status', [TableController::class, 'updateStatus'])->name('tables.updateStatus');
+    Route::post('/tables/merge', [TableController::class, 'merge'])->name('tables.merge');
+    Route::post('/tables/{table}/move-to/{target}', [TableController::class, 'move'])->name('tables.move');
+
+    // Kitchen Display
+    Route::get('/kitchen/orders', [KitchenController::class, 'orders'])->name('kitchen.orders');
+    Route::patch('/kitchen/orders/{kitchenOrder}/status', [KitchenController::class, 'updateStatus'])->name('kitchen.updateStatus');
+    Route::post('/kitchen/orders/{kitchenOrder}/print', [KitchenController::class, 'printOrder'])->name('kitchen.print');
+
+    // Cash Management
+    Route::post('/cash/in', [CashController::class, 'cashIn'])->name('cash.in');
+    Route::post('/cash/out', [CashController::class, 'cashOut'])->name('cash.out');
+});

@@ -8,9 +8,17 @@ use App\Models\ProductPrice;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class ProductsImport implements ToModel, WithHeadingRow
 {
+    protected $outletId;
+
+    public function __construct($outletId = null)
+    {
+        $this->outletId = $outletId ?? 1;
+    }
+
     public function model(array $row)
     {
         // Find or create category
@@ -24,7 +32,7 @@ class ProductsImport implements ToModel, WithHeadingRow
 
         // Create product
         $product = Product::create([
-            'business_id' => 1, // TODO: get from session/auth
+            'business_id' => 1, // TODO: get from auth
             'category_id' => $category?->id,
             'name' => $row['name'],
             'slug' => Str::slug($row['name']),
@@ -37,10 +45,10 @@ class ProductsImport implements ToModel, WithHeadingRow
             'is_pos_visible' => true,
         ]);
 
-        // Create price
+        // Create price if sell_price exists
         if (isset($row['sell_price'])) {
             $product->prices()->create([
-                'outlet_id' => session('outlet_id', 1),
+                'outlet_id' => $this->outletId,
                 'buy_price' => $row['buy_price'] ?? 0,
                 'sell_price' => $row['sell_price'],
             ]);

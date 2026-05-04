@@ -9,30 +9,37 @@ use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\ProductsExport;
 use App\Imports\ProductsImport;
 
 class ProductController extends Controller
 {
+    /**
+     * Display listing of products
+     */
     public function index(Request $request)
     {
-        $query = Product::with(['category', 'prices' => function($q) {
-            $q->where('outlet_id', session('outlet_id', 1));
-        }, 'stocks']);
-
-        if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%')
+        $outletId = session('outlet_id', 1);
+        
+        $query = Product::with([
+                'category', 
+                'prices' => function($q) use ($outletId) {
+                    $q->where('outlet_id', $outletId);
+                }, 
+                'stocks' => function($q) use ($outletId) {
+                    $q->where('outlet_id', $outletId);
+                }
+            ])
+            ->when($request->filled('search'), function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
                   ->orWhere('sku', 'like', '%' . $request->search . '%')
                   ->orWhere('barcode', 'like', '%' . $request->search . '%');
-        }
-
-        if ($request->filled('category_id')) {
-            $query->where('category_id', $request->category_id);
-        }
-
-        if ($request->filled('is_active')) {
-            $query->where('is_active', $request->is_active);
-        }
+            })
+            ->when($request->filled('category_id'), function ($q) use ($request) {
+                $q->where('category_id', $request->category_id);
+            })
+            ->when($request->filled('is_active'), function ($q) use ($request) {
+                $q->where('is_active', $request->is_active);
+            });
 
         $products = $query->orderBy('name')->paginate(25);
         $categories = Category::all();
@@ -40,13 +47,18 @@ class ProductController extends Controller
         return view('products.index', compact('products', 'categories'));
     }
 
+    /**
+     * Show create form
+     */
     public function create()
     {
-        $businesses = Business::all();
         $categories = Category::all();
-        return view('products.create', compact('categories', 'businesses'));
+        return view('products.create', compact('categories'));
     }
 
+    /**
+     * Store new product
+     */
     public function store(StoreProductRequest $request)
     {
         $validated = $request->validated();
@@ -74,21 +86,28 @@ class ProductController extends Controller
         return redirect()->route('products.index')->with('success', 'Produk berhasil ditambahkan');
     }
 
+    /**
+     * Show single product
+     */
     public function show(Product $product)
     {
         $product->load(['category', 'prices', 'stocks', 'variants', 'saleItems']);
         return view('products.show', compact('product'));
     }
 
+    /**
+     * Show edit form
+     */
     public function edit(Product $product)
     {
         $this->authorize('update', $product);
-        
         $categories = Category::all();
-        $businesses = Business::all();
-        return view('products.edit', compact('product', 'categories', 'businesses'));
+        return view('products.edit', compact('product', 'categories'));
     }
 
+    /**
+     * Update product
+     */
     public function update(UpdateProductRequest $request, Product $product)
     {
         $validated = $request->validated();
@@ -100,7 +119,7 @@ class ProductController extends Controller
 
         $product->update($validated);
 
-        // Always update prices for current outlet when provided
+        // Update prices for current outlet if provided
         if ($buyPrice !== null || $sellPrice !== null) {
             $updateData = [];
             if ($buyPrice !== null) $updateData['buy_price'] = $buyPrice;
@@ -121,6 +140,9 @@ class ProductController extends Controller
         return redirect()->route('products.index')->with('success', 'Produk berhasil diperbarui');
     }
 
+    /**
+     * Delete product
+     */
     public function destroy(Product $product)
     {
         $this->authorize('delete', $product);
@@ -130,7 +152,7 @@ class ProductController extends Controller
     }
 
     /**
-     * Search produk untuk POS (API)
+     * API: Search products for POS
      */
     public function search(Request $request)
     {
@@ -181,72 +203,9 @@ class ProductController extends Controller
             'file' => 'required|mimes:xlsx,csv,ods',
         ]);
 
-        Excel::import(new ProductsImport, $request->file('file'));
+        $outletId = session('outlet_id', 1);
+        Excel::import(new ProductsImport($outletId), $request->file('file'));
 
         return back()->with('success', 'Produk berhasil diimport');
-    }
-}
-}
-
-
-        if ($request->filled('category_id')) {
-            $query->where('category_id', $request->category_id);
-        }
-
-        $products = $query->paginate(20);
-        $categories = Category::all();
-
-        return view('products.index', compact('products', 'categories'));
-    }
-
-    public function create()
-    {
-        $categories = Category::all();
-        return view('products.create', compact('categories'));
-    }
-
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'category_id' => 'nullable|exists:categories,id',
-            'sku' => 'required|unique:products',
-            'barcode' => 'nullable',
-            'description' => 'nullable',
-            'unit' => 'required',
-            'track_stock' => 'boolean',
-        ]);
-
-        Product::create($validated);
-
-        return redirect()->route('products.index')->with('success', 'Produk berhasil ditambahkan');
-    }
-
-    public function show(Product $product)
-    {
-        return view('products.show', compact('product'));
-    }
-
-    public function edit(Product $product)
-    {
-        $categories = Category::all();
-        return view('products.edit', compact('product', 'categories'));
-    }
-
-    public function update(Request $request, Product $product)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'category_id' => 'nullable|exists:categories,id',
-            'sku' => 'required|unique:products,sku,' . $product->id,
-            'barcode' => 'nullable',
-            'description' => 'nullable',
-            'unit' => 'required',
-            'track_stock' => 'boolean',
-        ]);
-
-        $product->update($validated);
-
-        return redirect()->route('products.index')->with('success', 'Produk berhasil diperbarui');
     }
 }

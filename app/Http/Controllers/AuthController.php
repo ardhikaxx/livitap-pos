@@ -8,7 +8,10 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
-    // API: POST /api/v1/auth/login
+    /**
+     * API: POST /api/v1/auth/login
+     * Login menggunakan Sanctum guard
+     */
     public function login(Request $request)
     {
         $request->validate([
@@ -16,7 +19,8 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        // Gunakan guard 'sanctum' untuk API authentication
+        if (!Auth::guard('sanctum')->attempt($request->only('email', 'password'))) {
             return response()->json([
                 'success' => false,
                 'message' => 'Email atau password salah',
@@ -25,48 +29,59 @@ class AuthController extends Controller
 
         $user = User::where('email', $request->email)->first();
         
-        if (!$user->is_active) {
-            Auth::logout();
+        if (!$user || !$user->is_active) {
+            Auth::guard('sanctum')->logout();
             return response()->json([
                 'success' => false,
                 'message' => 'Akun tidak aktif',
             ], 403);
         }
 
+        // Buat token API
         $token = $user->createToken('pos-token')->plainTextToken;
         $user->update(['last_login_at' => now()]);
 
+        // Load relasi
         $user->load(['roles', 'permissions', 'outlets', 'primaryOutlet', 'business']);
 
         return response()->json([
             'success' => true,
-            'message' => 'Login successful',
+            'message' => 'Login berhasil',
             'data' => [
                 'user' => [
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
+                    'phone' => $user->phone,
+                    'photo' => $user->photo,
                     'business' => $user->business,
                     'outlets' => $user->outlets,
                     'primary_outlet' => $user->primaryOutlet,
                     'roles' => $user->roles->pluck('name'),
                     'permissions' => $user->permissions->pluck('name'),
+                    'last_login_at' => $user->last_login_at,
                 ],
                 'token' => $token,
+                'token_type' => 'Bearer',
             ],
         ]);
     }
 
-    // API: POST /api/v1/auth/register (disabled)
+    /**
+     * API: POST /api/v1/auth/register (disabled)
+     */
     public function register(Request $request)
     {
         return response()->json([
             'success' => false,
-            'message' => 'Register tidak diizinkan. Gunakan seeder.',
+            'message' => 'Pendaftaran tidak diizinkan. Gunakan seeder.',
         ], 403);
     }
 
-    // API: GET /api/v1/auth/me
+    /**
+     * API: GET /api/v1/auth/me
+     * Get current authenticated user
+     */
     public function me(Request $request)
     {
         $user = $request->user();
@@ -78,6 +93,8 @@ class AuthController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
+                'phone' => $user->phone,
+                'photo' => $user->photo,
                 'business' => $user->business,
                 'outlets' => $user->outlets,
                 'primary_outlet' => $user->primaryOutlet,
@@ -88,28 +105,18 @@ class AuthController extends Controller
         ]);
     }
 
-    // API: POST /api/v1/auth/logout
+    /**
+     * API: POST /api/v1/auth/logout
+     * Logout dan hapus token
+     */
     public function logout(Request $request)
     {
+        // Hapus token yang sedang digunakan
         $request->user()->currentAccessToken()->delete();
-        Auth::logout();
 
         return response()->json([
             'success' => true,
-            'message' => 'Logout successful',
-        ]);
-    }
-}
-
-    public function logout(Request $request)
-    {
-        Auth::guard('sanctum')->logout();
-        $request->session()->invalidate();
-        $request->session()->destroyToken();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Logged out successfully'
+            'message' => 'Logout berhasil',
         ]);
     }
 }

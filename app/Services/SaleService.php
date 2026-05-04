@@ -16,13 +16,21 @@ class SaleService
     {
         return DB::transaction(function () use ($data, $user) {
             $outletId = $data['outlet_id'];
+            
+            // Check for active shift - create one if not exists
             $shift = Shift::where('user_id', $user->id)
                 ->where('outlet_id', $outletId)
                 ->where('status', 'open')
                 ->first();
 
             if (!$shift) {
-                throw new \Exception('Shift belum dibuka');
+                $shift = Shift::create([
+                    'outlet_id' => $outletId,
+                    'user_id' => $user->id,
+                    'status' => 'open',
+                    'opened_at' => now(),
+                    'opening_cash' => 0,
+                ]);
             }
 
             $subtotal = 0;
@@ -47,8 +55,6 @@ class SaleService
                 'total' => $total,
                 'paid_amount' => $data['paid_amount'],
                 'change_amount' => $data['paid_amount'] - $total,
-                'notes' => $data['notes'] ?? null,
-                'order_type' => $data['order_type'] ?? 'dine_in',
             ]);
 
             foreach ($data['items'] as $item) {
@@ -92,15 +98,5 @@ class SaleService
 
             return $sale;
         });
-    }
-
-    public function calculateChange(float $paidAmount, float $total): float
-    {
-        return max(0, $paidAmount - $total);
-    }
-
-    public function formatRupiah(float $amount): string
-    {
-        return 'Rp ' . number_format($amount, 0, ',', '.');
     }
 }

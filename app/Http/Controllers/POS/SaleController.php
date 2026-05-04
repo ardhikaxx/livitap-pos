@@ -14,13 +14,9 @@ class SaleController extends Controller
     {
         try {
             $sale = $this->saleService->createSale($request->validated(), auth()->user());
-            return response()->json([
-                'success' => true, 
-                'message' => 'Transaksi Berhasil',
-                'data' => $sale
-            ]);
+            return redirect()->route('pos.index')->with('success', 'Transaksi berhasil disimpan. No: ' . $sale->invoice_number);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+            return back()->with('error', $e->getMessage());
         }
     }
 }

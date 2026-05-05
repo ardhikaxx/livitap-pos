@@ -33,8 +33,12 @@ Route::post('/logout', function () {
 // Protected Routes
 Route::middleware(['auth', 'check.business', 'set.outlet'])->group(function () {
 
+    // Dashboard
+    Route::get('/dashboard', [App\Http\Controllers\ReportController::class, 'dashboard'])->name('dashboard');
+
     // Dashboard / POS
     Route::get('/pos', [DashboardController::class, 'index'])->name('pos.index');
+    Route::get('/pos/transactions', [App\Http\Controllers\POS\TransactionController::class, 'index'])->name('pos.transactions.index');
     Route::post('/pos', [SaleController::class, 'store'])->name('pos.store');
     Route::get('/pos/{sale}/receipt', [SaleController::class, 'receipt'])->name('pos.receipt');
     Route::post('/pos/sale/{sale}/void', [SaleController::class, 'void'])->name('pos.void');
@@ -49,8 +53,10 @@ Route::middleware(['auth', 'check.business', 'set.outlet'])->group(function () {
     Route::get('/shifts/{shift}', [ShiftController::class, 'show'])->name('shifts.show');
     Route::get('/shifts/{shift}/report', [ShiftController::class, 'report'])->name('shifts.report');
 
-// Products Management
-        Route::resource('products', ProductController::class);
+    // Products Management
+    Route::resource('products', ProductController::class);
+    Route::resource('categories', App\Http\Controllers\CategoryController::class);
+    Route::resource('users', App\Http\Controllers\UserController::class);
     Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
     Route::post('/products/import', [ProductController::class, 'import'])->name('products.import');
 

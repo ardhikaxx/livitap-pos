@@ -60,12 +60,22 @@ class SaleService
             // Generate invoice number
             $invoiceNumber = 'INV-' . Carbon::now()->format('Ymd') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
 
+            // Process Customer
+            $customerId = $data['customer_id'] ?? null;
+            if (!$customerId && isset($data['customer_name'])) {
+                $customer = \App\Models\Customer::firstOrCreate([
+                    'name' => $data['customer_name'],
+                    'business_id' => $user->business_id,
+                ]);
+                $customerId = $customer->id;
+            }
+
             // Create Sale
             $sale = Sale::create([
                 'id' => Str::uuid(),
                 'outlet_id' => $outletId,
                 'user_id' => $user->id,
-                'customer_id' => $data['customer_id'] ?? null,
+                'customer_id' => $customerId,
                 'shift_id' => $shift->id,
                 'invoice_number' => $invoiceNumber,
                 'sale_date' => now(),

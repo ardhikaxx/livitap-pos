@@ -16,13 +16,28 @@ class SaleController extends Controller
         protected DiscountService $discountService
     ) {}
 
-    public function store(StoreSaleRequest $request)
+    public function store(Request $request)
     {
         try {
-            $sale = $this->saleService->createSale($request->validated(), auth()->user());
-            return redirect()->route('pos.receipt', $sale->id)->with('success', 'Transaksi berhasil disimpan');
+            // Karena POS menggunakan fetch JSON, kita gunakan request raw
+            // Pastikan data valid
+            $data = $request->all();
+            
+            $sale = $this->saleService->createSale($data, auth()->user());
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Transaksi berhasil disimpan',
+                'data' => [
+                    'invoice_number' => $sale->invoice_number,
+                    'id' => $sale->id
+                ]
+            ]);
         } catch (\Exception $e) {
-            return back()->with('error', $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
         }
     }
 

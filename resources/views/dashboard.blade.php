@@ -138,6 +138,10 @@
 
                     <form action="{{ route('shifts.close', $active_shift) }}" method="POST">
                         @csrf
+                        <div class="mb-3">
+                            <label class="small text-muted">Uang Tunai Akhir</label>
+                            <input type="number" name="closing_cash" class="form-control" required value="0">
+                        </div>
                         <button type="submit" class="btn btn-danger w-100 py-2 fw-bold rounded-3">
                             <i class="bi bi-lock me-2"></i> Tutup Shift
                         </button>
@@ -148,9 +152,13 @@
                             <i class="bi bi-clock-history fs-2 text-muted"></i>
                         </div>
                         <p class="text-muted mb-4">Tidak ada shift yang aktif saat ini.</p>
-                        <a href="{{ route('shifts.open') }}" class="btn btn-success w-100 py-2 fw-bold rounded-3">
-                            <i class="bi bi-unlock me-2"></i> Buka Shift Baru
-                        </a>
+                        <form action="{{ route('shifts.open') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="opening_cash" value="0">
+                            <button type="submit" class="btn btn-success w-100 py-2 fw-bold rounded-3">
+                                <i class="bi bi-unlock me-2"></i> Buka Shift Baru
+                            </button>
+                        </form>
                     </div>
                 @endif
             </div>

@@ -96,17 +96,6 @@ Route::middleware(['auth', 'check.business', 'set.outlet'])->group(function () {
         Route::put('/receipt', [SettingsController::class, 'updateReceipt'])->name('receipt.update');
     });
 
-    // F&B - Table Management
-    Route::get('/tables', [TableController::class, 'index'])->name('tables.index');
-    Route::patch('/tables/{table}/status', [TableController::class, 'updateStatus'])->name('tables.updateStatus');
-    Route::post('/tables/merge', [TableController::class, 'merge'])->name('tables.merge');
-    Route::post('/tables/{table}/move-to/{target}', [TableController::class, 'move'])->name('tables.move');
-
-    // Kitchen Display
-    Route::get('/kitchen/orders', [KitchenController::class, 'orders'])->name('kitchen.orders');
-    Route::patch('/kitchen/orders/{kitchenOrder}/status', [KitchenController::class, 'updateStatus'])->name('kitchen.updateStatus');
-    Route::post('/kitchen/orders/{kitchenOrder}/print', [KitchenController::class, 'printOrder'])->name('kitchen.print');
-
     // Cash Management
     Route::post('/cash/in', [CashController::class, 'cashIn'])->name('cash.in');
     Route::post('/cash/out', [CashController::class, 'cashOut'])->name('cash.out');

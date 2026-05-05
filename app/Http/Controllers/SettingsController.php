@@ -120,25 +120,20 @@ class SettingsController extends Controller
 
     public function updateReceipt(Request $request)
     {
-        $outlet = \App\Models\Outlet::find(session('outlet_id'));
+        $business = Business::find(session('business_id'));
 
-        if (!$outlet) {
-            return back()->with('error', 'Outlet tidak ditemukan.');
+        if (!$business) {
+            return back()->with('error', 'Bisnis tidak ditemukan.');
         }
 
-        $this->authorize('update', $outlet);
+        $this->authorize('update', $business);
 
         $validated = $request->validate([
-            'receipt_settings' => 'required|array',
-            'receipt_settings.header' => 'nullable|string|max:500',
-            'receipt_settings.footer' => 'nullable|string|max:500',
-            'receipt_settings.paper_size' => 'required|in:58mm,80mm,A4',
-            'receipt_settings.show_logo' => 'boolean',
-            'receipt_settings.show_tax' => 'boolean',
-            'receipt_settings.show_payment_method' => 'boolean',
+            'receipt_header' => 'nullable|string|max:500',
+            'receipt_footer' => 'nullable|string|max:500',
         ]);
 
-        $outlet->update(['receipt_settings' => $validated['receipt_settings']]);
+        $business->update($validated);
 
         return back()->with('success', 'Pengaturan struk berhasil disimpan');
     }

@@ -63,28 +63,6 @@
                 </a>
             </li>
 
-            @php
-                $isFnb = $activeBusiness && (
-                    $activeBusiness->type === 'fnb' ||
-                    !empty(($activeBusiness->settings['enable_fnb'] ?? false))
-                );
-            @endphp
-
-            @if($isFnb)
-            <li class="nav-item">
-                <a href="{{ route('tables.index') }}" class="nav-link {{ request()->routeIs('tables.*') ? 'active' : '' }}">
-                    <i class="bi bi-grid-3x3-gap"></i>
-                    <span>Meja</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ route('kitchen.orders') }}" class="nav-link {{ request()->routeIs('kitchen.*') ? 'active' : '' }}">
-                    <i class="bi bi-fire"></i>
-                    <span>Dapur</span>
-                </a>
-            </li>
-            @endif
-
             <li class="mt-4 mb-2 px-3">
                 <small class="text-uppercase fw-bold text-secondary" style="font-size: 0.65rem; letter-spacing: 0.05em;">Laporan</small>
             </li>
@@ -99,9 +77,15 @@
                 <small class="text-uppercase fw-bold text-secondary" style="font-size: 0.65rem; letter-spacing: 0.05em;">Sistem</small>
             </li>
             <li class="nav-item">
-                <a href="{{ route('settings.business') }}" class="nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}">
+                <a href="{{ route('settings.business') }}" class="nav-link {{ request()->routeIs('settings.business') ? 'active' : '' }}">
                     <i class="bi bi-gear"></i>
                     <span>Pengaturan</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('settings.receipt') }}" class="nav-link {{ request()->routeIs('settings.receipt') ? 'active' : '' }}">
+                    <i class="bi bi-receipt"></i>
+                    <span>Pengaturan Struk</span>
                 </a>
             </li>
             <li class="nav-item">

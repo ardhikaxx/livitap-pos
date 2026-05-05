@@ -130,7 +130,7 @@ class ReportController extends Controller
 
     public function dashboard()
     {
-        $outletId = session('outlet_id');
+        $outletId = session('outlet_id') ?? 1;
         $summary = $this->reportService->dashboardSummary($outletId);
 
         return view('dashboard', $summary);

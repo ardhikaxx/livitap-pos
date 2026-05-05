@@ -24,39 +24,25 @@ class ShiftController extends Controller
             ->first();
 
         if ($existing) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Shift sudah dibuka',
-                'shift' => $existing,
-            ], 400);
+            return back()->with('error', 'Shift sudah dibuka');
         }
 
-        $shift = $this->shiftService->openShift($user, $request->opening_cash ?? 0, $outletId);
+        $this->shiftService->openShift($user, $request->opening_cash ?? 0, $outletId);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Shift dibuka',
-            'shift' => $shift,
-        ]);
+        return redirect()->route('dashboard')->with('success', 'Shift berhasil dibuka');
     }
 
     public function close(Request $request, Shift $shift)
     {
-        $this->authorize('close', $shift);
-
         $request->validate([
             'closing_cash' => 'required|numeric',
             'notes' => 'nullable|string|max:1000',
         ]);
 
         $shiftService = app(ShiftService::class);
-        $shift = $shiftService->closeShift($shift, $request->closing_cash, $request->notes);
+        $shiftService->closeShift($shift, $request->closing_cash, $request->notes);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Shift ditutup',
-            'data' => $shift,
-        ]);
+        return redirect()->route('dashboard')->with('success', 'Shift berhasil ditutup');
     }
 
     public function active()

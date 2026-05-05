@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\POS\DashboardController;
 use App\Http\Controllers\POS\SaleController;
 use App\Http\Controllers\POS\ShiftController;
-...
 use App\Http\Controllers\AuthController;
 
 Route::get('/', function () {

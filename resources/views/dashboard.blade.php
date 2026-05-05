@@ -71,7 +71,7 @@
 </div>
 
 <div class="row g-4">
-    <div class="col-lg-8">
+    <div class="col-lg-12">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body p-4">
                 <div class="d-flex align-items-center justify-content-between mb-4">
@@ -106,15 +106,6 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-4">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body p-4 text-center">
-                <i class="bi bi-info-circle text-muted" style="font-size: 3rem;"></i>
-                <p class="text-muted mt-3">Sistem siap digunakan.</p>
             </div>
         </div>
     </div>

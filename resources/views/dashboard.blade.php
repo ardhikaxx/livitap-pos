@@ -42,11 +42,11 @@
             <div class="card-body p-4">
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <div class="bg-info bg-opacity-10 text-info rounded-3 p-2">
-                        <i class="bi bi-ticket-perforated fs-4"></i>
+                        <i class="bi bi-wallet2 fs-4"></i>
                     </div>
                 </div>
-                <p class="text-muted small mb-1 fw-medium">Tiket Rata-rata</p>
-                <h4 class="fw-bold mb-0">Rp {{ number_format($average_ticket ?? 0, 0, ',', '.') }}</h4>
+                <p class="text-muted small mb-1 fw-medium">Omzet Bersih</p>
+                <h4 class="fw-bold mb-0">Rp {{ number_format($today_net_sales ?? 0, 0, ',', '.') }}</h4>
             </div>
         </div>
     </div>
@@ -93,7 +93,7 @@
                                     <div class="fw-semibold">{{ $product->product->name ?? 'Unknown' }}</div>
                                     <div class="text-muted small">{{ $product->product->category->name ?? 'Umum' }}</div>
                                 </td>
-                                <td class="px-3 py-3 text-end fw-bold">{{ $product->total_qty ?? 0 }}</td>
+                                <td class="px-3 py-3 text-end fw-bold">{{ (int) $product->total_qty }}</td>
                             </tr>
                             @empty
                             <tr>

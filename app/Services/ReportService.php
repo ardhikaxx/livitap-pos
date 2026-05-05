@@ -154,6 +154,7 @@ class ReportService
 
         return [
             'today_sales' => $todaySales->sum('total'),
+            'today_net_sales' => $todaySales->sum('total') - $todaySales->sum('discount_amount'),
             'today_transactions' => $todaySales->count(),
             'yesterday_sales' => $yesterdaySales->sum('total'),
             'growth' => $yesterdaySales->sum('total') > 0 
@@ -166,11 +167,13 @@ class ReportService
 
     private function getTopProductToday($date)
     {
-        return SaleItem::select('product_id', DB::raw('SUM(qty) as total_qty'))
+        return SaleItem::with('product.category')
+            ->select('product_id', DB::raw('SUM(qty) as total_qty'))
             ->join('sales', 'sale_items.sale_id', '=', 'sales.id')
             ->whereDate('sales.sale_date', $date)
             ->groupBy('product_id')
             ->orderByDesc('total_qty')
-            ->first();
+            ->limit(5)
+            ->get();
     }
 }

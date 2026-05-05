@@ -88,13 +88,9 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::delete('/discounts/{discount}', [DiscountController::class, 'destroy']);
     Route::post('/vouchers/validate', [DiscountController::class, 'validateVoucher']);
 
-    // Settings (Business & Outlet)
-    Route::get('/settings/business', [SettingsController::class, 'business']);
-    Route::put('/settings/business', [SettingsController::class, 'updateBusiness']);
-    Route::get('/settings/outlet', [SettingsController::class, 'outlet']);
-    Route::put('/settings/outlet', [SettingsController::class, 'updateOutlet']);
-    Route::get('/settings/receipt', [SettingsController::class, 'receipt']);
-    Route::put('/settings/receipt', [SettingsController::class, 'updateReceipt']);
+    // Settings (Global)
+    Route::get('/settings/global', [GlobalSettingsController::class, 'index']);
+    Route::put('/settings/global', [GlobalSettingsController::class, 'update']);
 
     // F&B - Tables & Kitchen
     Route::get('/tables', [TableController::class, 'index']);

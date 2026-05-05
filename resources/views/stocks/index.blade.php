@@ -34,9 +34,9 @@
                     @forelse($stocks as $stock)
                     <tr>
                         <td>{{ $stock->product->name }}</td>
-                        <td class="text-end">{{ $stock->qty }}</td>
-                        <td class="text-end">{{ $stock->min_qty }}</td>
-                        <td class="text-end">{{ $stock->max_qty ?? '-' }}</td>
+                        <td class="text-end">{{ (int) $stock->qty }}</td>
+                        <td class="text-end">{{ (int) $stock->min_qty }}</td>
+                        <td class="text-end">{{ $stock->max_qty ? (int) $stock->max_qty : '-' }}</td>
                         <td class="text-center">
                             @if($stock->qty <= $stock->min_qty && $stock->min_qty > 0)
                                 <span class="badge bg-danger">LOW STOCK</span>

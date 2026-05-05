@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Sale;
-use App\Models\Shift;
 use App\Models\Product;
 use App\Models\StockMovement;
 use App\Models\Customer;
@@ -62,37 +61,11 @@ class ReportController extends Controller
         return view('reports.stock', $report);
     }
 
-    public function cashier(Request $request)
-    {
-        $from = $request->date_from ? \Carbon\Carbon::parse($request->date_from) : \Carbon\Carbon::today()->startOfMonth();
-        $to = $request->date_to ? \Carbon\Carbon::parse($request->date_to) : \Carbon\Carbon::today();
-
-        $shifts = Shift::with(['user', 'sales', 'cashFlows'])
-            ->whereBetween('opened_at', [$from, $to])
-            ->orderBy('opened_at', 'desc')
-            ->paginate(20);
-
-        return view('reports.cashier', compact('shifts', 'from', 'to'));
-    }
-
-    public function shift(Shift $shift)
-    {
-        $report = $this->reportService->shiftReport($shift);
-        
-        return view('reports.shift', [
-            'shift' => $report['shift'],
-            'summary' => $report['summary'],
-            'payment_breakdown' => $report['payment_breakdown'],
-            'sales' => $report['sales'],
-            'cash_flows' => $report['cash_flows'],
-        ]);
-    }
-
     public function export(Request $request)
     {
         $request->validate([
             'type' => 'required|in:pdf,excel',
-            'report' => 'required|in:sales,products,stock,cashier',
+            'report' => 'required|in:sales,products,stock',
             'date_from' => 'nullable|date',
             'date_to' => 'nullable|date',
         ]);
@@ -111,14 +84,6 @@ class ReportController extends Controller
                 $report = $this->reportService->stockReport();
                 $data = $report['stocks'];
                 break;
-        }
-
-        if ($request->type === 'excel') {
-            // Export dengan Maatwebsite Excel
-            // return Excel::raw(new CustomExport($data), \Maatwebsite\Excel\Excel::XLSX);
-        } else {
-            // Export PDF dengan DomPDF
-            // return PDF::loadView('reports.'.$reportType, compact('data'))->download();
         }
 
         return back()->with('success', 'Export berhasil (demo)');

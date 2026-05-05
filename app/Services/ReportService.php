@@ -101,40 +101,6 @@ class ReportService
     }
 
     /**
-     * Laporan shift kasir
-     */
-    public function shiftReport(Shift $shift)
-    {
-        $shift->load(['user', 'sales.items.product', 'cashFlows']);
-        
-        $totalSales = $shift->sales->sum('total');
-        $totalTransactions = $shift->sales->count();
-        $averageTicket = $totalTransactions > 0 ? $totalSales / $totalTransactions : 0;
-
-        $paymentBreakdown = $shift->sales->flatMap->payments()
-            ->groupBy('method')
-            ->map(function ($payments) {
-                return $payments->sum('amount');
-            });
-
-        return [
-            'shift' => $shift,
-            'summary' => [
-                'total_sales' => $totalSales,
-                'total_transactions' => $totalTransactions,
-                'average_ticket' => $averageTicket,
-                'opening_cash' => $shift->opening_cash,
-                'closing_cash' => $shift->closing_cash,
-                'expected_cash' => $shift->expected_cash,
-                'difference' => $shift->difference,
-            ],
-            'payment_breakdown' => $paymentBreakdown,
-            'sales' => $shift->sales,
-            'cash_flows' => $shift->cashFlows,
-        ];
-    }
-
-    /**
      * Dashboard summary untuk hari ini
      */
     public function dashboardSummary($date = null)
@@ -149,9 +115,6 @@ class ReportService
             ->where('status', 'paid')
             ->get();
 
-        $activeShift = Shift::where('status', 'open')
-            ->first();
-
         return [
             'today_sales' => $todaySales->sum('total'),
             'today_net_sales' => $todaySales->sum('total') - $todaySales->sum('discount_amount'),
@@ -160,7 +123,6 @@ class ReportService
             'growth' => $yesterdaySales->sum('total') > 0 
                 ? (($todaySales->sum('total') - $yesterdaySales->sum('total')) / $yesterdaySales->sum('total')) * 100 
                 : 0,
-            'active_shift' => $activeShift,
             'top_product_today' => $this->getTopProductToday($date),
         ];
     }

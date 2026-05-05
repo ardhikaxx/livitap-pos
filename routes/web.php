@@ -4,16 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\POS\DashboardController;
 use App\Http\Controllers\POS\SaleController;
 use App\Http\Controllers\POS\ShiftController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\DiscountController;
-use App\Http\Controllers\ReportController;
-use App\Http\Controllers\StockController;
-use App\Http\Controllers\SettingsController;
-use App\Http\Controllers\TableController;
-use App\Http\Controllers\KitchenController;
-use App\Http\Controllers\CashController;
-use App\Http\Controllers\Auth\LoginController;
+...
 use App\Http\Controllers\AuthController;
 
 Route::get('/', function () {
@@ -22,7 +13,7 @@ Route::get('/', function () {
 
 // Auth Routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [LoginController::class, 'login']);
+Route::post('/login', [LoginController::class, 'login');
 Route::post('/logout', function () {
     auth()->logout();
     request()->session()->invalidate();
@@ -45,13 +36,6 @@ Route::middleware(['auth', 'check.business', 'set.outlet'])->group(function () {
     Route::post('/pos/hold', [SaleController::class, 'hold'])->name('pos.hold');
     Route::get('/pos/holds', [SaleController::class, 'holds'])->name('pos.holds');
     Route::post('/pos/cart/calculate', [SaleController::class, 'calculateCart'])->name('pos.calculate');
-
-    // Shift Management
-    Route::post('/shifts/open', [ShiftController::class, 'open'])->name('shifts.open');
-    Route::get('/shifts/active', [ShiftController::class, 'active'])->name('shifts.active');
-    Route::post('/shifts/{shift}/close', [ShiftController::class, 'close'])->name('shifts.close');
-    Route::get('/shifts/{shift}', [ShiftController::class, 'show'])->name('shifts.show');
-    Route::get('/shifts/{shift}/report', [ShiftController::class, 'report'])->name('shifts.report');
 
     // Products Management
     Route::resource('products', ProductController::class);
@@ -79,7 +63,6 @@ Route::middleware(['auth', 'check.business', 'set.outlet'])->group(function () {
     Route::get('/reports/products', [ReportController::class, 'products'])->name('reports.products');
     Route::get('/reports/stock', [ReportController::class, 'stock'])->name('reports.stock');
     Route::get('/reports/cashier', [ReportController::class, 'cashier'])->name('reports.cashier');
-    Route::get('/reports/shift/{shift}', [ReportController::class, 'shift'])->name('reports.shift');
     Route::post('/reports/export', [ReportController::class, 'export'])->name('reports.export');
 
     // Discounts & Vouchers

@@ -60,11 +60,7 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::post('/stocks/opname/{opname}/close', [StockController::class, 'closeOpname']);
 
     // Shift Management
-    Route::post('/shifts/open', [ShiftController::class, 'open']);
-    Route::get('/shifts/active', [ShiftController::class, 'active']);
-    Route::post('/shifts/{shift}/close', [ShiftController::class, 'close']);
-    Route::get('/shifts/{shift}', [ShiftController::class, 'show']);
-    Route::get('/shifts/{shift}/report', [ShiftController::class, 'report']);
+    // Shift system removed
 
     // Customers
     Route::get('/customers', [CustomerController::class, 'index']);

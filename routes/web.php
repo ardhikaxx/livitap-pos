@@ -12,7 +12,7 @@ Route::get('/', function () {
 
 // Auth Routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [LoginController::class, 'login');
+Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', function () {
     auth()->logout();
     request()->session()->invalidate();

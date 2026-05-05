@@ -12,14 +12,11 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $products = Product::with(['category', 'prices' => function($q) {
-            $q->where('outlet_id', session('outlet_id', 1));
-        }])->where('is_active', true)->where('is_pos_visible', true)->get();
+        $products = Product::with(['category', 'prices'])->where('is_active', true)->where('is_pos_visible', true)->get();
         
         $categories = Category::all();
         
         $activeShift = Shift::where('user_id', auth()->id())
-            ->where('outlet_id', session('outlet_id', 1))
             ->where('status', 'open')
             ->first();
 

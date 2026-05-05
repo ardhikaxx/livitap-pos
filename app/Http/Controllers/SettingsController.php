@@ -13,15 +13,35 @@ class SettingsController extends Controller
      */
     public function business()
     {
-        $businesses = auth()->user()->businesses ?? collect();
-        $currentBusiness = Business::find(session('business_id')) 
-            ?? $businesses->first();
+        // Resolve bisnis dari session, atau dari outlet aktif, atau dari business_id user
+        $currentBusiness = Business::find(session('business_id'));
 
-        return view('settings.business', compact('businesses', 'currentBusiness'));
+        if (!$currentBusiness) {
+            $outlet = \App\Models\Outlet::find(session('outlet_id'));
+            $currentBusiness = $outlet?->business;
+            if ($currentBusiness) {
+                session(['business_id' => $currentBusiness->id]);
+            }
+        }
+
+        if (!$currentBusiness && auth()->user()->business_id) {
+            $currentBusiness = auth()->user()->business;
+            if ($currentBusiness) {
+                session(['business_id' => $currentBusiness->id]);
+            }
+        }
+
+        return view('settings.business', compact('currentBusiness'));
     }
 
-    public function updateBusiness(Request $request, Business $business)
+    public function updateBusiness(Request $request)
     {
+        $business = Business::find(session('business_id'));
+
+        if (!$business) {
+            return back()->with('error', 'Bisnis tidak ditemukan.');
+        }
+
         $this->authorize('update', $business);
 
         $validated = $request->validate([
@@ -59,8 +79,14 @@ class SettingsController extends Controller
         return view('settings.outlet', compact('outlets', 'currentOutlet'));
     }
 
-    public function updateOutlet(Request $request, Outlet $outlet)
+    public function updateOutlet(Request $request)
     {
+        $outlet = \App\Models\Outlet::find(session('outlet_id'));
+
+        if (!$outlet) {
+            return back()->with('error', 'Outlet tidak ditemukan.');
+        }
+
         $this->authorize('update', $outlet);
 
         $validated = $request->validate([
@@ -92,8 +118,14 @@ class SettingsController extends Controller
         return view('settings.receipt', compact('outlet'));
     }
 
-    public function updateReceipt(Request $request, Outlet $outlet)
+    public function updateReceipt(Request $request)
     {
+        $outlet = \App\Models\Outlet::find(session('outlet_id'));
+
+        if (!$outlet) {
+            return back()->with('error', 'Outlet tidak ditemukan.');
+        }
+
         $this->authorize('update', $outlet);
 
         $validated = $request->validate([

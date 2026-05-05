@@ -18,31 +18,27 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $outletId = session('outlet_id', 1);
-        
-        $query = Product::with([
-                'category', 
-                'prices' => function($q) use ($outletId) {
-                    $q->where('outlet_id', $outletId);
-                }, 
-                'stocks' => function($q) use ($outletId) {
-                    $q->where('outlet_id', $outletId);
-                }
-            ])
-            ->when($request->filled('search'), function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('sku', 'like', '%' . $request->search . '%')
-                  ->orWhere('barcode', 'like', '%' . $request->search . '%');
-            })
-            ->when($request->filled('category_id'), function ($q) use ($request) {
-                $q->where('category_id', $request->category_id);
-            })
-            ->when($request->filled('is_active'), function ($q) use ($request) {
-                $q->where('is_active', $request->is_active);
-            });
+        $outletId   = session('outlet_id', 1);
+        $businessId = session('business_id');
 
-        $products = $query->orderBy('name')->paginate(25);
-        $categories = Category::all();
+        $query = Product::with([
+                'category',
+                'prices' => fn($q) => $q->where('outlet_id', $outletId),
+                'stocks'  => fn($q) => $q->where('outlet_id', $outletId),
+            ])
+            ->when($businessId, fn($q) => $q->where('business_id', $businessId))
+            ->when($request->filled('search'), fn($q) => $q
+                ->where(fn($sub) => $sub
+                    ->where('name', 'like', '%'.$request->search.'%')
+                    ->orWhere('sku', 'like', '%'.$request->search.'%')
+                    ->orWhere('barcode', 'like', '%'.$request->search.'%')
+                )
+            )
+            ->when($request->filled('category_id'), fn($q) => $q->where('category_id', $request->category_id))
+            ->when($request->filled('is_active'),   fn($q) => $q->where('is_active', $request->is_active));
+
+        $products   = $query->orderBy('name')->paginate(25);
+        $categories = Category::when($businessId, fn($q) => $q->where('business_id', $businessId))->get();
 
         return view('products.index', compact('products', 'categories'));
     }
@@ -62,25 +58,34 @@ class ProductController extends Controller
     public function store(StoreProductRequest $request)
     {
         $validated = $request->validated();
-        
-        // Extract price data
-        $buyPrice = $validated['buy_price'];
+
+        // Inject business_id & outlet_id dari session
+        $validated['business_id'] = session('business_id');
+        $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']) . '-' . uniqid();
+        $outletId = session('outlet_id', 1);
+
+        $buyPrice  = $validated['buy_price'];
         $sellPrice = $validated['sell_price'];
         unset($validated['buy_price'], $validated['sell_price']);
 
         $product = Product::create($validated);
 
-        // Handle photo upload
         if ($request->hasFile('photo')) {
             $path = $request->file('photo')->store('products/photos', 'public');
             $product->update(['photo' => $path]);
         }
 
-        // Create default product price for current outlet
         $product->prices()->create([
-            'outlet_id' => session('outlet_id', 1),
-            'buy_price' => $buyPrice,
+            'outlet_id'  => $outletId,
+            'buy_price'  => $buyPrice,
             'sell_price' => $sellPrice,
+        ]);
+
+        // Buat record stok awal (qty 0) agar produk muncul di manajemen stok
+        $product->stocks()->create([
+            'outlet_id' => $outletId,
+            'qty'       => 0,
+            'min_qty'   => $validated['min_stock'] ?? 0,
         ]);
 
         return redirect()->route('products.index')->with('success', 'Produk berhasil ditambahkan');
@@ -91,16 +96,25 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        $product->load(['category', 'prices', 'stocks', 'variants', 'saleItems']);
+        $outletId = session('outlet_id', 1);
+        $product->load([
+            'category',
+            'prices' => fn($q) => $q->where('outlet_id', $outletId),
+            'stocks' => fn($q) => $q->where('outlet_id', $outletId),
+            'variants',
+            'saleItems'
+        ]);
         return view('products.show', compact('product'));
     }
 
-    /**
-     * Show edit form
-     */
     public function edit(Product $product)
     {
         $this->authorize('update', $product);
+        $outletId = session('outlet_id', 1);
+        $product->load([
+            'prices' => fn($q) => $q->where('outlet_id', $outletId),
+            'stocks' => fn($q) => $q->where('outlet_id', $outletId),
+        ]);
         $categories = Category::all();
         return view('products.edit', compact('product', 'categories'));
     }

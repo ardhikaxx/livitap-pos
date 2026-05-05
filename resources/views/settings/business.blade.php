@@ -14,7 +14,7 @@
                 Anda belum memiliki bisnis. Silakan buat bisnis terlebih dahulu.
             </div>
         @else
-        <form method="POST" action="{{ route('settings.business.update', $currentBusiness) }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('settings.business.update') }}" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <div class="row g-3">

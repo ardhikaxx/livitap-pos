@@ -27,6 +27,15 @@
                 👥 Pelanggan
             </a>
         </li>
+
+        @php
+            $isFnb = $activeBusiness && (
+                $activeBusiness->type === 'fnb' ||
+                !empty(($activeBusiness->settings['enable_fnb'] ?? false))
+            );
+        @endphp
+
+        @if($isFnb)
         <li class="nav-item">
             <a href="{{ route('tables.index') }}" class="nav-link text-white {{ request()->routeIs('tables.*') ? 'active' : '' }}">
                 🪑 Meja
@@ -37,6 +46,7 @@
                 🍳 Dapur
             </a>
         </li>
+        @endif
 
         <li class="mt-2 mb-1 px-2">
             <small class="text-secondary text-uppercase fw-bold" style="font-size: 0.7rem;">Laporan</small>

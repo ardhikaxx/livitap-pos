@@ -10,7 +10,7 @@
     <div class="card-body">
         <h5 class="card-title mb-4">Pengaturan Outlet</h5>
 
-        <form method="POST" action="{{ route('settings.outlet.update', $currentOutlet) }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('settings.outlet.update') }}" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <div class="row g-3">

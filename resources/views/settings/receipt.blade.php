@@ -10,7 +10,7 @@
     <div class="card-body">
         <h5 class="card-title mb-4">Pengaturan Struk</h5>
 
-        <form method="POST" action="{{ route('settings.receipt.update', $outlet) }}">
+        <form method="POST" action="{{ route('settings.receipt.update') }}">
             @csrf
             @method('PUT')
             <div class="row g-3">

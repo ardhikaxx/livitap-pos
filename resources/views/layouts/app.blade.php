@@ -11,6 +11,9 @@
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
+    {{-- x-cloak harus ada di head agar modal tidak flash sebelum Alpine init --}}
+    <style>[x-cloak] { display: none !important; }</style>
+
     <style>
         body { overflow-x: hidden; }
         #sidebar .nav-link:hover { background-color: rgba(255,255,255,0.1); }
@@ -44,6 +47,9 @@
             </nav>
         </div>
 
+        @hasSection('full_content')
+            @yield('full_content')
+        @else
         <main class="p-4">
             @if (session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -61,6 +67,7 @@
 
             @yield('content')
         </main>
+        @endif
     </div>
 </div>
 

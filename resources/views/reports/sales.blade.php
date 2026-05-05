@@ -5,121 +5,114 @@
 @endsection
 
 @section('content')
-<div class="card border-0 shadow-sm">
-    <div class="card-body">
-        <h5 class="card-title mb-4">Laporan Penjualan</h5>
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h4 class="fw-bold mb-1">Laporan Penjualan</h4>
+        <p class="text-muted small mb-0">Analisis kinerja penjualan Anda dalam satu tampilan.</p>
+    </div>
+</div>
 
-        <form method="GET" class="row g-2 mb-4">
+<div class="card border-0 shadow-sm mb-4 rounded-3">
+    <div class="card-body p-4">
+        <form method="GET" class="row g-4 align-items-end">
             <div class="col-md-3">
-                <label class="form-label form-label-sm">Dari Tanggal</label>
-                <input type="date" name="date_from" value="{{ $from->format('Y-m-d') }}" class="form-control form-control-sm">
+                <label class="form-label small fw-bold text-uppercase text-muted">Dari Tanggal</label>
+                <input type="date" name="date_from" value="{{ $from->format('Y-m-d') }}" class="form-control form-control-lg shadow-none border-light">
             </div>
             <div class="col-md-3">
-                <label class="form-label form-label-sm">Sampai Tanggal</label>
-                <input type="date" name="date_to" value="{{ $to->format('Y-m-d') }}" class="form-control form-control-sm">
+                <label class="form-label small fw-bold text-uppercase text-muted">Sampai Tanggal</label>
+                <input type="date" name="date_to" value="{{ $to->format('Y-m-d') }}" class="form-control form-control-lg shadow-none border-light">
             </div>
             <div class="col-md-3">
-                <label class="form-label form-label-sm">Kasir</label>
-                <select name="user_id" class="form-select form-select-sm">
+                <label class="form-label small fw-bold text-uppercase text-muted">Kasir</label>
+                <select name="user_id" class="form-select form-select-lg shadow-none border-light">
                     <option value="">Semua Kasir</option>
                     @foreach($users as $user)
                         <option value="{{ $user->id }}" {{ request('user_id') == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
                     @endforeach
                 </select>
             </div>
-            <div class="col-md-auto d-flex align-items-end">
-                <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold shadow-sm">
+                    <i class="bi bi-funnel me-2"></i> Terapkan Filter
+                </button>
             </div>
         </form>
+    </div>
+</div>
 
-        <div class="row g-3 mb-4">
-            <div class="col-md-3">
-                <div class="card bg-primary text-white border-0">
-                    <div class="card-body py-3">
-                        <p class="small mb-1">Total Penjualan</p>
-                        <h5 class="mb-0">Rp {{ number_format($summary['total_sales'], 0, ',', '.') }}</h5>
-                    </div>
+<div class="row g-4 mb-4">
+    @php
+    $stats = [
+        ['label' => 'Total Penjualan', 'value' => 'Rp ' . number_format($summary['total_sales'], 0, ',', '.'), 'icon' => 'bi-graph-up-arrow', 'color' => 'primary'],
+        ['label' => 'Total Transaksi', 'value' => $summary['total_transactions'], 'icon' => 'bi-receipt-cutoff', 'color' => 'success'],
+        ['label' => 'Rata-rata/Transaksi', 'value' => 'Rp ' . number_format($summary['average_per_transaction'], 0, ',', '.'), 'icon' => 'bi-wallet2', 'color' => 'info'],
+        ['label' => 'Total Item Terjual', 'value' => $summary['total_items'], 'icon' => 'bi-box-seam', 'color' => 'warning'],
+    ];
+    @endphp
+
+    @foreach($stats as $stat)
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm rounded-3 h-100">
+            <div class="card-body p-4 d-flex align-items-center">
+                <div class="rounded-3 bg-{{ $stat['color'] }} bg-opacity-10 text-{{ $stat['color'] }} p-3 me-3">
+                    <i class="bi {{ $stat['icon'] }} fs-4"></i>
                 </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card bg-success text-white border-0">
-                    <div class="card-body py-3">
-                        <p class="small mb-1">Total Transaksi</p>
-                        <h5 class="mb-0">{{ $summary['total_transactions'] }}</h5>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card bg-info text-white border-0">
-                    <div class="card-body py-3">
-                        <p class="small mb-1">Rata-rata per Transaksi</p>
-                        <h5 class="mb-0">Rp {{ number_format($summary['average_per_transaction'], 0, ',', '.') }}</h5>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card bg-warning text-dark border-0">
-                    <div class="card-body py-3">
-                        <p class="small mb-1">Total Item Terjual</p>
-                        <h5 class="mb-0">{{ $summary['total_items'] }}</h5>
-                    </div>
+                <div>
+                    <p class="text-muted small mb-0">{{ $stat['label'] }}</p>
+                    <h5 class="fw-bold mb-0 text-dark">{{ $stat['value'] }}</h5>
                 </div>
             </div>
         </div>
+    </div>
+    @endforeach
+</div>
 
-        <h6 class="fw-semibold mb-3">Pembayaran per Metode</h6>
-        <div class="row g-3 mb-4">
-            @foreach($paymentMethods as $method => $amount)
-            <div class="col-md-3">
-                <div class="card border">
-                    <div class="card-body py-2">
-                        <p class="small text-muted mb-1">{{ str_replace('_', ' ', $method) }}</p>
-                        <p class="fw-semibold mb-0">Rp {{ number_format($amount, 0, ',', '.') }}</p>
-                    </div>
-                </div>
-            </div>
-            @endforeach
-        </div>
-
-        <h6 class="fw-semibold mb-3">Daftar Transaksi</h6>
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="card-header bg-white border-0 p-4 pb-0 d-flex justify-content-between align-items-center">
+        <h6 class="fw-bold mb-0">Daftar Transaksi Lengkap</h6>
+        <button class="btn btn-sm btn-light text-muted fw-bold"><i class="bi bi-download me-1"></i> Export Excel</button>
+    </div>
+    <div class="card-body p-4">
         <div class="table-responsive">
-            <table class="table table-hover table-sm">
-                <thead class="table-light">
+            <table class="table table-hover align-middle">
+                <thead class="text-uppercase small text-muted">
                     <tr>
-                        <th>No. Invoice</th>
-                        <th>Tanggal</th>
-                        <th>Kasir</th>
-                        <th class="text-end">Total</th>
-                        <th class="text-center">Status</th>
-                        <th class="text-end">Aksi</th>
+                        <th class="px-3 py-3 border-0">No. Invoice</th>
+                        <th class="px-3 py-3 border-0">Tanggal</th>
+                        <th class="px-3 py-3 border-0">Kasir</th>
+                        <th class="px-3 py-3 border-0 text-end">Total</th>
+                        <th class="px-3 py-3 border-0 text-center">Status</th>
+                        <th class="px-3 py-3 border-0 text-end">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($sales as $sale)
                     <tr>
-                        <td>{{ $sale->invoice_number }}</td>
-                        <td>{{ $sale->sale_date->format('d/m/Y H:i') }}</td>
-                        <td>{{ $sale->user->name ?? '-' }}</td>
-                        <td class="text-end">Rp {{ number_format($sale->total, 0, ',', '.') }}</td>
-                        <td class="text-center">
-                            <span class="badge {{ $sale->status === 'paid' ? 'bg-success' : 'bg-warning text-dark' }}">
-                                {{ $sale->status }}
+                        <td class="px-3 py-3 fw-bold text-dark">{{ $sale->invoice_number }}</td>
+                        <td class="px-3 py-3 text-muted">{{ $sale->sale_date->format('d/m/Y H:i') }}</td>
+                        <td class="px-3 py-3 fw-medium">{{ $sale->user->name ?? '-' }}</td>
+                        <td class="px-3 py-3 text-end fw-bold text-primary">Rp {{ number_format($sale->total, 0, ',', '.') }}</td>
+                        <td class="px-3 py-3 text-center">
+                            <span class="badge {{ $sale->status === 'paid' ? 'bg-success' : 'bg-warning' }} rounded-pill px-3 py-2">
+                                {{ ucfirst($sale->status) }}
                             </span>
                         </td>
-                        <td class="text-end">
-                            <a href="{{ route('pos.receipt', $sale) }}" target="_blank" class="btn btn-outline-secondary btn-sm">Struk</a>
+                        <td class="px-3 py-3 text-end">
+                            <a href="{{ route('pos.receipt', $sale) }}" target="_blank" class="btn btn-sm btn-light border-0 shadow-none fw-bold text-primary">
+                                <i class="bi bi-printer me-1"></i> Struk
+                            </a>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="text-center text-muted py-4">Belum ada transaksi pada periode ini.</td>
+                        <td colspan="6" class="text-center text-muted py-5">Belum ada transaksi pada periode ini.</td>
                     </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
-
-        <div class="mt-3">{{ $sales->links() }}</div>
+        <div class="mt-4">{{ $sales->links() }}</div>
     </div>
 </div>
 @endsection

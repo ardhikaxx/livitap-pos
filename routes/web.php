@@ -3,8 +3,14 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\POS\DashboardController;
 use App\Http\Controllers\POS\SaleController;
-use App\Http\Controllers\POS\ShiftController;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\StockController;
+use App\Http\Controllers\GlobalSettingsController;
+use App\Http\Controllers\CashController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\DiscountController;
 
 Route::get('/', function () {
     return redirect()->route('pos.index');
@@ -13,18 +19,20 @@ Route::get('/', function () {
 // Auth Routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
+use Illuminate\Support\Facades\Auth;
+
 Route::post('/logout', function () {
-    auth()->logout();
+    Auth::logout();
     request()->session()->invalidate();
     request()->session()->regenerateToken();
     return redirect('/login');
 })->name('logout');
 
 // Protected Routes
-Route::middleware(['auth', 'check.business', 'set.outlet'])->group(function () {
+Route::middleware(['auth'])->group(function () {
 
     // Dashboard
-    Route::get('/dashboard', [App\Http\Controllers\ReportController::class, 'dashboard'])->name('dashboard');
+    Route::get('/dashboard', [ReportController::class, 'dashboard'])->name('dashboard');
 
     // Dashboard / POS
     Route::get('/pos', [DashboardController::class, 'index'])->name('pos.index');
@@ -68,15 +76,9 @@ Route::middleware(['auth', 'check.business', 'set.outlet'])->group(function () {
     Route::resource('discounts', DiscountController::class);
     Route::post('/discounts/validate-voucher', [DiscountController::class, 'validateVoucher'])->name('discounts.validateVoucher');
 
-    // Settings
-    Route::prefix('settings')->name('settings.')->group(function () {
-        Route::get('/business', [SettingsController::class, 'business'])->name('business');
-        Route::put('/business', [SettingsController::class, 'updateBusiness'])->name('business.update');
-        Route::get('/outlet', [SettingsController::class, 'outlet'])->name('outlet');
-        Route::put('/outlet', [SettingsController::class, 'updateOutlet'])->name('outlet.update');
-        Route::get('/receipt', [SettingsController::class, 'receipt'])->name('receipt');
-        Route::put('/receipt', [SettingsController::class, 'updateReceipt'])->name('receipt.update');
-    });
+    // Global Settings
+    Route::get('/settings/global', [GlobalSettingsController::class, 'index'])->name('settings.global');
+    Route::put('/settings/global', [GlobalSettingsController::class, 'update'])->name('settings.global.update');
 
     // Cash Management
     Route::post('/cash/in', [CashController::class, 'cashIn'])->name('cash.in');

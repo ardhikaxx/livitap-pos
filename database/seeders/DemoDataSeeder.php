@@ -44,7 +44,6 @@ class DemoDataSeeder extends Seeder
             Category::firstOrCreate(
                 ['slug' => $cat[1]],
                 [
-                    'business_id' => $business->id,
                     'name' => $cat[0],
                     'slug' => $cat[1],
                     'icon' => $cat[2],
@@ -88,7 +87,6 @@ class DemoDataSeeder extends Seeder
             $product = Product::firstOrCreate(
                 ['sku' => $productData[1]],
                 [
-                    'business_id' => $business->id,
                     'category_id' => $productData[2],
                     'name' => $productData[0],
                     'slug' => strtolower(str_replace(' ', '-', $productData[0])),

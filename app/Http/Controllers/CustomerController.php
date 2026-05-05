@@ -14,7 +14,6 @@ class CustomerController extends Controller
             ->with(['sales' => function($q) {
                 $q->latest()->limit(1);
             }])
-            ->where('business_id', session('business_id'))
             ->latest()
             ->paginate(20);
 

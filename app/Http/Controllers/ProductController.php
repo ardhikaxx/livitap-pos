@@ -26,7 +26,6 @@ class ProductController extends Controller
                 'prices' => fn($q) => $q->where('outlet_id', $outletId),
                 'stocks'  => fn($q) => $q->where('outlet_id', $outletId),
             ])
-            ->when($businessId, fn($q) => $q->where('business_id', $businessId))
             ->when($request->filled('search'), fn($q) => $q
                 ->where(fn($sub) => $sub
                     ->where('name', 'like', '%'.$request->search.'%')
@@ -38,7 +37,7 @@ class ProductController extends Controller
             ->when($request->filled('is_active'),   fn($q) => $q->where('is_active', $request->is_active));
 
         $products   = $query->orderBy('name')->paginate(25);
-        $categories = Category::when($businessId, fn($q) => $q->where('business_id', $businessId))->get();
+        $categories = Category::get();
 
         return view('products.index', compact('products', 'categories'));
     }
@@ -58,14 +57,11 @@ class ProductController extends Controller
     public function store(StoreProductRequest $request)
     {
         $validated = $request->validated();
-
-        // Inject business_id & outlet_id dari session
-        $validated['business_id'] = session('business_id');
-        $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']) . '-' . uniqid();
         $outletId = session('outlet_id', 1);
 
-        $buyPrice  = $validated['buy_price'];
-        $sellPrice = $validated['sell_price'];
+        $buyPrice  = $validated['buy_price'] ?? 0;
+        $sellPrice = $validated['sell_price'] ?? 0;
+        $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']) . '-' . uniqid();
         unset($validated['buy_price'], $validated['sell_price']);
 
         $product = Product::create($validated);
@@ -81,7 +77,6 @@ class ProductController extends Controller
             'sell_price' => $sellPrice,
         ]);
 
-        // Buat record stok awal (qty 0) agar produk muncul di manajemen stok
         $product->stocks()->create([
             'outlet_id' => $outletId,
             'qty'       => 0,

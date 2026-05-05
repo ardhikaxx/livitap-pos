@@ -5,22 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Category extends Model
 {
     protected $fillable = [
-        'business_id', 'parent_id', 'name', 'slug', 'icon', 'color', 'sort_order', 'is_active'
+        'parent_id', 'name', 'slug', 'icon', 'color', 'sort_order', 'is_active'
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
     ];
-
-    public function business(): BelongsTo
-    {
-        return $this->belongsTo(Business::class);
-    }
 
     public function parent(): BelongsTo
     {

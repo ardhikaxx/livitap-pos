@@ -10,16 +10,15 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = Category::where('business_id', session('business_id'))->paginate(20);
+        $categories = Category::paginate(20);
         return view('categories.index', compact('categories'));
     }
 
     public function store(Request $request)
     {
         $request->validate(['name' => 'required|string|max:255']);
-        
+
         Category::create([
-            'business_id' => session('business_id'),
             'name' => $request->name,
             'slug' => Str::slug($request->name),
             'is_active' => true,

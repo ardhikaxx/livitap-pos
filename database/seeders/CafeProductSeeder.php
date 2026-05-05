@@ -25,14 +25,13 @@ class CafeProductSeeder extends Seeder
         foreach ($categories as $catName => $products) {
             $category = Category::firstOrCreate([
                 'name' => $catName,
-                'business_id' => $businessId,
                 'slug' => Str::slug($catName),
                 'is_active' => true
             ]);
 
             foreach ($products as $prodName) {
                 $product = Product::updateOrCreate(
-                    ['name' => $prodName, 'business_id' => $businessId],
+                    ['name' => $prodName],
                     [
                         'category_id' => $category->id,
                         'slug' => Str::slug($prodName),

@@ -13,7 +13,7 @@ class Product extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'business_id', 'category_id', 'name', 'slug', 'sku', 'barcode', 'description',
+        'category_id', 'name', 'slug', 'sku', 'barcode', 'description',
         'unit', 'track_stock', 'has_variant', 'is_composite', 'photo', 'is_active', 'is_pos_visible', 'is_favorite'
     ];
 
@@ -25,11 +25,6 @@ class Product extends Model
         'is_pos_visible' => 'boolean',
         'is_favorite' => 'boolean',
     ];
-
-    public function business(): BelongsTo
-    {
-        return $this->belongsTo(Business::class);
-    }
 
     public function category(): BelongsTo
     {

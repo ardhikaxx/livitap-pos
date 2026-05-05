@@ -32,7 +32,6 @@ class ProductsImport implements ToModel, WithHeadingRow
 
         // Create product
         $product = Product::create([
-            'business_id' => 1, // TODO: get from auth
             'category_id' => $category?->id,
             'name' => $row['name'],
             'slug' => Str::slug($row['name']),

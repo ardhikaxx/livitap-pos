@@ -18,8 +18,8 @@ class TransactionSeeder extends Seeder
     {
         // Pastikan ada data pendukung
         $user = User::first() ?? User::factory()->create();
-        $customer = Customer::firstOrCreate(['name' => 'Budi Santoso', 'business_id' => 1]);
-        $product = Product::first() ?? Product::create(['name' => 'Produk Demo', 'business_id' => 1, 'category_id' => 1, 'sku' => 'DEMO']);
+        $customer = Customer::firstOrCreate(['name' => 'Budi Santoso']);
+        $product = Product::first() ?? Product::create(['name' => 'Produk Demo', 'category_id' => 1, 'sku' => 'DEMO']);
         $shift = Shift::firstOrCreate(
             ['user_id' => $user->id, 'status' => 'open'],
             ['outlet_id' => 1, 'opening_cash' => 100000]

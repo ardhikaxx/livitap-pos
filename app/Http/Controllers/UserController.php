@@ -11,7 +11,7 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::where('business_id', session('business_id'))->paginate(20);
+        $users = User::paginate(20);
         $roles = Role::all();
         return view('users.index', compact('users', 'roles'));
     }
@@ -26,7 +26,6 @@ class UserController extends Controller
         ]);
 
         $user = User::create([
-            'business_id' => session('business_id'),
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),

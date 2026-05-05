@@ -14,26 +14,6 @@ class DemoDataSeeder extends Seeder
 {
     public function run(): void
     {
-        // Create categories
-        $categories = [
-            ['Makanan', 'food', '🍔'],
-            ['Minuman', 'drink', '🥤'],
-            ['Cemilan', 'snack', '🍿'],
-            ['Keperluan Sehari-hari', 'daily', '🧻'],
-        ];
-
-        foreach ($categories as $cat) {
-            Category::firstOrCreate(
-                ['slug' => $cat[1]],
-                [
-                    'name' => $cat[0],
-                    'slug' => $cat[1],
-                    'icon' => $cat[2],
-                    'is_active' => true,
-                ]
-            );
-        }
-
         // Add Cafe Products
         $cafeCategories = [
             'Coffee' => ['Espresso', 'Americano', 'Latte', 'Cappuccino'],

@@ -22,7 +22,7 @@ class Sale extends Model
     protected $fillable = [
         'user_id', 'customer_id', 'invoice_number', 'type', 'status',
         'sale_date', 'subtotal', 'discount_amount', 'tax_amount', 'total',
-        'paid_amount', 'change_amount', 'notes', 'table_id', 'order_type', 'shift_id'
+        'paid_amount', 'change_amount', 'notes', 'table_id', 'order_type'
     ];
 
     protected $casts = [
@@ -34,11 +34,6 @@ class Sale extends Model
         'paid_amount' => 'decimal:2',
         'change_amount' => 'decimal:2',
     ];
-
-    public function outlet(): BelongsTo
-    {
-        return $this->belongsTo(Outlet::class);
-    }
 
     public function user(): BelongsTo
     {
@@ -58,11 +53,6 @@ class Sale extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(SalePayment::class);
-    }
-
-    public function shift(): BelongsTo
-    {
-        return $this->belongsTo(Shift::class);
     }
 
     public function table(): BelongsTo

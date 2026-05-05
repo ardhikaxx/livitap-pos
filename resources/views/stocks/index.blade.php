@@ -1,57 +1,63 @@
 @extends('layouts.app')
 
+@section('breadcrumb')
+<li class="breadcrumb-item active">Stok</li>
+@endsection
+
 @section('content')
-<div class="bg-white p-6 rounded-lg shadow">
-    <h1 class="text-2xl font-bold mb-6">Stok Produk</h1>
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <h5 class="card-title mb-4">Stok Produk</h5>
 
-    <form method="GET" class="mb-6">
-        <input type="text" name="search" value="{{ request('search') }}" 
-            placeholder="Cari produk..." 
-            class="border rounded px-4 py-2 w-64">
-        <button type="submit" class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 ml-2">Cari</button>
-    </form>
+        <form method="GET" class="row g-2 mb-4">
+            <div class="col-md-4">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari produk..." class="form-control form-control-sm">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-secondary btn-sm">Cari</button>
+            </div>
+        </form>
 
-    <div class="overflow-x-auto">
-        <table class="min-w-full border">
-            <thead class="bg-gray-100">
-                <tr>
-                    <th class="px-4 py-2 text-left">Produk</th>
-                    <th class="px-4 py-2 text-right">Stok</th>
-                    <th class="px-4 py-2 text-right">Min</th>
-                    <th class="px-4 py-2 text-right">Max</th>
-                    <th class="px-4 py-2 text-center">Status</th>
-                    <th class="px-4 py-2 text-right">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($stocks as $stock)
-                <tr class="border-b hover:bg-gray-50">
-                    <td class="px-4 py-3">{{ $stock->product->name }}</td>
-                    <td class="px-4 py-3 text-right">{{ $stock->qty }}</td>
-                    <td class="px-4 py-3 text-right">{{ $stock->min_qty }}</td>
-                    <td class="px-4 py-3 text-right">{{ $stock->max_qty ?? '-' }}</td>
-                    <td class="px-4 py-3 text-center">
-                        @if($stock->qty <= $stock->min_qty && $stock->min_qty > 0)
-                            <span class="text-red-600 font-bold">LOW STOCK</span>
-                        @else
-                            <span class="text-green-600">OK</span>
-                        @endif
-                    </td>
-                    <td class="px-4 py-3 text-right">
-                        <a href="{{ route('stocks.adjust', $stock->product) }}" class="text-blue-500 hover:underline">Adjust</a>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="6" class="px-4 py-8 text-center text-gray-500">Belum ada data stok.</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="table-light">
+                    <tr>
+                        <th>Produk</th>
+                        <th class="text-end">Stok</th>
+                        <th class="text-end">Min</th>
+                        <th class="text-end">Max</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-end">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($stocks as $stock)
+                    <tr>
+                        <td>{{ $stock->product->name }}</td>
+                        <td class="text-end">{{ $stock->qty }}</td>
+                        <td class="text-end">{{ $stock->min_qty }}</td>
+                        <td class="text-end">{{ $stock->max_qty ?? '-' }}</td>
+                        <td class="text-center">
+                            @if($stock->qty <= $stock->min_qty && $stock->min_qty > 0)
+                                <span class="badge bg-danger">LOW STOCK</span>
+                            @else
+                                <span class="badge bg-success">OK</span>
+                            @endif
+                        </td>
+                        <td class="text-end">
+                            <a href="{{ route('stocks.adjust', $stock->product) }}" class="btn btn-outline-primary btn-sm">Adjust</a>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">Belum ada data stok.</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
 
-    <div class="mt-6">
-        {{ $stocks->withQueryString()->links() }}
+        <div class="mt-3">{{ $stocks->withQueryString()->links() }}</div>
     </div>
 </div>
 @endsection

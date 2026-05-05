@@ -1,51 +1,50 @@
 @extends('layouts.app')
 
+@section('breadcrumb')
+<li class="breadcrumb-item"><a href="{{ route('customers.index') }}">Pelanggan</a></li>
+<li class="breadcrumb-item active">Detail</li>
+@endsection
+
 @section('content')
-<div class="bg-white p-6 rounded-lg shadow">
-    <h1 class="text-2xl font-bold mb-6">Detail Pelanggan</h1>
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <h5 class="card-title mb-4">Detail Pelanggan</h5>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-            <h3 class="font-semibold mb-4">Informasi Dasar</h3>
-            <table class="w-full">
-                <tr><td class="py-2 font-medium">Nama:</td><td>{{ $customer->name }}</td></tr>
-                <tr><td class="py-2 font-medium">Telepon:</td><td>{{ $customer->phone }}</td></tr>
-                <tr><td class="py-2 font-medium">Email:</td><td>{{ $customer->email ?? '-' }}</td></tr>
-                <tr><td class="py-2 font-medium">Alamat:</td><td>{{ $customer->address ?? '-' }}</td></tr>
-                <tr><td class="py-2 font-medium">Tier:</td><td>{{ ucfirst($customer->tier) }}</td></tr>
-                <tr><td class="py-2 font-medium">Poin:</td><td>{{ $customer->points }}</td></tr>
-                <tr><td class="py-2 font-medium">Limit Kredit:</td><td>Rp {{ number_format($customer->credit_limit ?? 0, 0, ',', '.') }}</td></tr>
-            </table>
-        </div>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <h6 class="fw-semibold mb-3">Informasi Dasar</h6>
+                <table class="table table-sm">
+                    <tr><th style="width:140px">Nama</th><td>{{ $customer->name }}</td></tr>
+                    <tr><th>Telepon</th><td>{{ $customer->phone }}</td></tr>
+                    <tr><th>Email</th><td>{{ $customer->email ?? '-' }}</td></tr>
+                    <tr><th>Alamat</th><td>{{ $customer->address ?? '-' }}</td></tr>
+                    <tr><th>Tier</th><td>{{ ucfirst($customer->tier) }}</td></tr>
+                    <tr><th>Poin</th><td>{{ $customer->points }}</td></tr>
+                    <tr><th>Limit Kredit</th><td>Rp {{ number_format($customer->credit_limit ?? 0, 0, ',', '.') }}</td></tr>
+                </table>
+            </div>
 
-        <div>
-            <h3 class="font-semibold mb-4">Riwayat Transaksi Terbaru</h3>
-            <div class="space-y-2">
+            <div class="col-md-6">
+                <h6 class="fw-semibold mb-3">Riwayat Transaksi Terbaru</h6>
                 @forelse($customer->sales as $sale)
-                    <div class="border p-3 rounded">
-                        <div class="flex justify-between">
+                    <div class="border rounded p-2 mb-2">
+                        <div class="d-flex justify-content-between">
                             <span>{{ $sale->invoice_number }}</span>
-                            <span class="font-bold">Rp {{ number_format($sale->total, 0, ',', '.') }}</span>
+                            <strong>Rp {{ number_format($sale->total, 0, ',', '.') }}</strong>
                         </div>
-                        <div class="text-sm text-gray-500">{{ $sale->sale_date->format('d/m/Y H:i') }}</div>
+                        <small class="text-muted">{{ $sale->sale_date->format('d/m/Y H:i') }}</small>
                     </div>
                 @empty
-                    <p class="text-gray-500">Belum ada transaksi</p>
+                    <p class="text-muted">Belum ada transaksi</p>
                 @endforelse
             </div>
         </div>
-    </div>
 
-    <div class="mt-8 flex space-x-4">
-        <a href="{{ route('customers.edit', $customer) }}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-            Edit Pelanggan
-        </a>
-        <a href="{{ route('customers.points', $customer) }}" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-            Riwayat Poin
-        </a>
-        <a href="{{ route('customers.transactions', $customer) }}" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
-            Semua Transaksi
-        </a>
+        <div class="d-flex gap-2 mt-4">
+            <a href="{{ route('customers.edit', $customer) }}" class="btn btn-primary">Edit Pelanggan</a>
+            <a href="{{ route('customers.points', $customer) }}" class="btn btn-success">Riwayat Poin</a>
+            <a href="{{ route('customers.transactions', $customer) }}" class="btn btn-info text-white">Semua Transaksi</a>
+        </div>
     </div>
 </div>
 @endsection

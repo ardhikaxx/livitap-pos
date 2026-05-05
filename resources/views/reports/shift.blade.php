@@ -1,69 +1,93 @@
 @extends('layouts.app')
 
+@section('breadcrumb')
+<li class="breadcrumb-item"><a href="{{ route('reports.sales') }}">Laporan</a></li>
+<li class="breadcrumb-item active">Shift #{{ $shift->id }}</li>
+@endsection
+
 @section('content')
-<div class="bg-white p-6 rounded-lg shadow">
-    <h1 class="text-2xl font-bold mb-6">Laporan Shift #{{ $shift->id }}</h1>
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <h5 class="card-title mb-4">Laporan Shift #{{ $shift->id }}</h5>
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div class="bg-blue-50 p-4 rounded">
-            <p class="text-sm text-gray-600">Total Penjualan</p>
-            <p class="text-2xl font-bold text-blue-600">Rp {{ number_format($summary['total_sales'], 0, ',', '.') }}</p>
-        </div>
-        <div class="bg-green-50 p-4 rounded">
-            <p class="text-sm text-gray-600">Transaksi</p>
-            <p class="text-2xl font-bold text-green-600">{{ $summary['total_transactions'] }}</p>
-        </div>
-        <div class="bg-purple-50 p-4 rounded">
-            <p class="text-sm text-gray-600">Rata-rata</p>
-            <p class="text-2xl font-bold text-purple-600">Rp {{ number_format($summary['average_ticket'], 0, ',', '.') }}</p>
-        </div>
-        <div class="bg-orange-50 p-4 rounded">
-            <p class="text-sm text-gray-600">Selisih Kas</p>
-            <p class="text-2xl font-bold {{ $summary['difference'] >= 0 ? 'text-green-600' : 'text-red-600' }}">
-                Rp {{ number_format(abs($summary['difference']), 0, ',', '.') }}
-                {{ $summary['difference'] >= 0 ? '(+)' : '(-)' }}
-            </p>
-        </div>
-    </div>
-
-    <div class="mb-8">
-        <h2 class="text-lg font-semibold mb-4">Pembayaran per Metode</h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            @foreach($payment_breakdown as $method => $amount)
-                <div class="border p-4 rounded">
-                    <p class="text-sm text-gray-600">{{ $method }}</p>
-                    <p class="text-xl font-semibold">Rp {{ number_format($amount, 0, ',', '.') }}</p>
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white border-0">
+                    <div class="card-body py-3">
+                        <p class="small mb-1">Total Penjualan</p>
+                        <h5 class="mb-0">Rp {{ number_format($summary['total_sales'], 0, ',', '.') }}</h5>
+                    </div>
                 </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white border-0">
+                    <div class="card-body py-3">
+                        <p class="small mb-1">Transaksi</p>
+                        <h5 class="mb-0">{{ $summary['total_transactions'] }}</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white border-0">
+                    <div class="card-body py-3">
+                        <p class="small mb-1">Rata-rata</p>
+                        <h5 class="mb-0">Rp {{ number_format($summary['average_ticket'], 0, ',', '.') }}</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card {{ $summary['difference'] >= 0 ? 'bg-success' : 'bg-danger' }} text-white border-0">
+                    <div class="card-body py-3">
+                        <p class="small mb-1">Selisih Kas</p>
+                        <h5 class="mb-0">Rp {{ number_format(abs($summary['difference']), 0, ',', '.') }} {{ $summary['difference'] >= 0 ? '(+)' : '(-)' }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h6 class="fw-semibold mb-3">Pembayaran per Metode</h6>
+        <div class="row g-3 mb-4">
+            @foreach($payment_breakdown as $method => $amount)
+            <div class="col-md-3">
+                <div class="card border">
+                    <div class="card-body py-2">
+                        <p class="small text-muted mb-1">{{ $method }}</p>
+                        <p class="fw-semibold mb-0">Rp {{ number_format($amount, 0, ',', '.') }}</p>
+                    </div>
+                </div>
+            </div>
             @endforeach
         </div>
-    </div>
 
-    <div>
-        <h2 class="text-lg font-semibold mb-4">Daftar Transaksi</h2>
-        <table class="min-w-full border">
-            <thead class="bg-gray-100">
-                <tr>
-                    <th class="px-4 py-2 text-left">Invoice</th>
-                    <th class="px-4 py-2 text-left">Waktu</th>
-                    <th class="px-4 py-2 text-right">Total</th>
-                    <th class="px-4 py-2 text-center">Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($sales as $sale)
-                <tr class="border-b">
-                    <td class="px-4 py-3">{{ $sale->invoice_number }}</td>
-                    <td class="px-4 py-3">{{ $sale->sale_date->format('H:i') }}</td>
-                    <td class="px-4 py-3 text-right">Rp {{ number_format($sale->total, 0, ',', '.') }}</td>
-                    <td class="px-4 py-3 text-center">{{ $sale->status }}</td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="4" class="px-4 py-8 text-center text-gray-500">Tidak ada transaksi</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
+        <h6 class="fw-semibold mb-3">Daftar Transaksi</h6>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="table-light">
+                    <tr>
+                        <th>Invoice</th>
+                        <th>Waktu</th>
+                        <th class="text-end">Total</th>
+                        <th class="text-center">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($sales as $sale)
+                    <tr>
+                        <td>{{ $sale->invoice_number }}</td>
+                        <td>{{ $sale->sale_date->format('H:i') }}</td>
+                        <td class="text-end">Rp {{ number_format($sale->total, 0, ',', '.') }}</td>
+                        <td class="text-center">
+                            <span class="badge {{ $sale->status === 'paid' ? 'bg-success' : 'bg-warning text-dark' }}">{{ $sale->status }}</span>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="4" class="text-center text-muted py-4">Tidak ada transaksi</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 @endsection

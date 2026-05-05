@@ -1,79 +1,80 @@
 @extends('layouts.app')
 
+@section('breadcrumb')
+<li class="breadcrumb-item active">Pelanggan</li>
+@endsection
+
 @section('content')
-<div class="bg-white p-6 rounded-lg shadow">
-    <h1 class="text-2xl font-bold mb-6">Manajemen Pelanggan</h1>
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="card-title mb-0">Manajemen Pelanggan</h5>
+            <a href="{{ route('customers.create') }}" class="btn btn-primary btn-sm">+ Tambah Pelanggan</a>
+        </div>
 
-    <div class="mb-4">
-        <a href="{{ route('customers.create') }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-            + Tambah Pelanggan
-        </a>
-    </div>
+        <form method="GET" class="row g-2 mb-4">
+            <div class="col-md-5">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama/telepon/email..." class="form-control form-control-sm">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-secondary btn-sm">Cari</button>
+            </div>
+        </form>
 
-    <form method="GET" class="mb-6">
-        <input type="text" name="search" value="{{ request('search') }}" 
-            placeholder="Cari nama/telepon/email..." 
-            class="border rounded px-4 py-2 w-96">
-        <button type="submit" class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 ml-2">Cari</button>
-    </form>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="table-light">
+                    <tr>
+                        <th>Nama</th>
+                        <th>Telepon</th>
+                        <th>Email</th>
+                        <th class="text-center">Tier</th>
+                        <th class="text-end">Poin</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-end">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($customers as $customer)
+                    <tr>
+                        <td>{{ $customer->name }}</td>
+                        <td>{{ $customer->phone }}</td>
+                        <td>{{ $customer->email ?? '-' }}</td>
+                        <td class="text-center">
+                            <span class="badge
+                                {{ $customer->tier == 'platinum' ? 'bg-purple' : '' }}
+                                {{ $customer->tier == 'gold' ? 'bg-warning text-dark' : '' }}
+                                {{ $customer->tier == 'silver' ? 'bg-secondary' : '' }}
+                                {{ $customer->tier == 'regular' ? 'bg-primary' : '' }}">
+                                {{ ucfirst($customer->tier) }}
+                            </span>
+                        </td>
+                        <td class="text-end">{{ $customer->points }}</td>
+                        <td class="text-center">
+                            <span class="badge {{ $customer->is_active ? 'bg-success' : 'bg-secondary' }}">
+                                {{ $customer->is_active ? 'Aktif' : 'Nonaktif' }}
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <a href="{{ route('customers.show', $customer) }}" class="btn btn-outline-info btn-sm">Detail</a>
+                            <a href="{{ route('customers.edit', $customer) }}" class="btn btn-outline-primary btn-sm">Edit</a>
+                            <form action="{{ route('customers.destroy', $customer) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Hapus pelanggan?')">Hapus</button>
+                            </form>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">Belum ada pelanggan.</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
 
-    <div class="overflow-x-auto">
-        <table class="min-w-full border">
-            <thead class="bg-gray-100">
-                <tr>
-                    <th class="px-4 py-2 text-left">Nama</th>
-                    <th class="px-4 py-2 text-left">Telepon</th>
-                    <th class="px-4 py-2 text-left">Email</th>
-                    <th class="px-4 py-2 text-center">Tier</th>
-                    <th class="px-4 py-2 text-right">Poin</th>
-                    <th class="px-4 py-2 text-center">Status</th>
-                    <th class="px-4 py-2 text-right">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($customers as $customer)
-                <tr class="border-b hover:bg-gray-50">
-                    <td class="px-4 py-3">{{ $customer->name }}</td>
-                    <td class="px-4 py-3">{{ $customer->phone }}</td>
-                    <td class="px-4 py-3">{{ $customer->email ?? '-' }}</td>
-                    <td class="px-4 py-3 text-center">
-                        <span class="px-2 py-1 rounded text-xs 
-                            {{ $customer->tier == 'platinum' ? 'bg-purple-100 text-purple-800' : '' }}
-                            {{ $customer->tier == 'gold' ? 'bg-yellow-100 text-yellow-800' : '' }}
-                            {{ $customer->tier == 'silver' ? 'bg-gray-100 text-gray-800' : '' }}
-                            {{ $customer->tier == 'regular' ? 'bg-blue-100 text-blue-800' : '' }}">
-                            {{ ucfirst($customer->tier) }}
-                        </span>
-                    </td>
-                    <td class="px-4 py-3 text-right">{{ $customer->points }}</td>
-                    <td class="px-4 py-3 text-center">
-                        <span class="px-2 py-1 rounded text-xs {{ $customer->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                            {{ $customer->is_active ? 'Aktif' : 'Nonaktif' }}
-                        </span>
-                    </td>
-                    <td class="px-4 py-3 text-right space-x-1">
-                        <a href="{{ route('customers.show', $customer) }}" class="text-blue-500 hover:underline">Detail</a>
-                        <a href="{{ route('customers.edit', $customer) }}" class="text-green-500 hover:underline">Edit</a>
-                        <form action="{{ route('customers.destroy', $customer) }}" method="POST" class="inline">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-red-500 hover:underline" onclick="return confirm('Hapus pelanggan?')">Hapus</button>
-                        </form>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="7" class="px-4 py-8 text-center text-gray-500">
-                        Belum ada pelanggan.
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-
-    <div class="mt-6">
-        {{ $customers->withQueryString()->links() }}
+        <div class="mt-3">{{ $customers->withQueryString()->links() }}</div>
     </div>
 </div>
 @endsection

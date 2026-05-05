@@ -1,43 +1,46 @@
 @extends('layouts.app')
 
+@section('breadcrumb')
+<li class="breadcrumb-item"><a href="{{ route('settings.business') }}">Pengaturan</a></li>
+<li class="breadcrumb-item active">Outlet</li>
+@endsection
+
 @section('content')
-<div class="bg-white p-6 rounded-lg shadow">
-    <h1 class="text-2xl font-bold mb-6">Pengaturan Outlet</h1>
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <h5 class="card-title mb-4">Pengaturan Outlet</h5>
 
-    <form method="POST" action="{{ route('settings.outlet.update', $currentOutlet) }}" enctype="multipart/form-data">
-        @csrf
-        @method('PUT')
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-                <label class="block font-medium mb-2">Nama Outlet</label>
-                <input type="text" name="name" value="{{ old('name', $currentOutlet->name) }}" class="w-full border rounded px-3 py-2" required>
+        <form method="POST" action="{{ route('settings.outlet.update', $currentOutlet) }}" enctype="multipart/form-data">
+            @csrf
+            @method('PUT')
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-medium">Nama Outlet</label>
+                    <input type="text" name="name" value="{{ old('name', $currentOutlet->name) }}" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-medium">Telepon</label>
+                    <input type="text" name="phone" value="{{ old('phone', $currentOutlet->phone) }}" class="form-control">
+                </div>
+                <div class="col-12">
+                    <label class="form-label fw-medium">Alamat</label>
+                    <textarea name="address" rows="2" class="form-control">{{ old('address', $currentOutlet->address) }}</textarea>
+                </div>
+                <div class="col-12">
+                    <label class="form-label fw-medium">Logo Outlet</label>
+                    @if($currentOutlet->logo)
+                        <div class="mb-2">
+                            <img src="{{ asset('storage/' . $currentOutlet->logo) }}" class="img-thumbnail" style="width:128px;height:128px;object-fit:cover;">
+                        </div>
+                    @endif
+                    <input type="file" name="logo" accept="image/*" class="form-control">
+                </div>
             </div>
 
-            <div>
-                <label class="block font-medium mb-2">Telepon</label>
-                <input type="text" name="phone" value="{{ old('phone', $currentOutlet->phone) }}" class="w-full border rounded px-3 py-2">
+            <div class="d-flex justify-content-end mt-4">
+                <button type="submit" class="btn btn-primary">Simpan Pengaturan</button>
             </div>
-
-            <div class="md:col-span-2">
-                <label class="block font-medium mb-2">Alamat</label>
-                <textarea name="address" rows="2" class="w-full border rounded px-3 py-2">{{ old('address', $currentOutlet->address) }}</textarea>
-            </div>
-
-            <div class="md:col-span-2">
-                <label class="block font-medium mb-2">Logo Outlet</label>
-                @if($currentOutlet->logo)
-                    <img src="{{ asset('storage/' . $currentOutlet->logo) }}" class="w-32 h-32 object-cover mb-2 rounded">
-                @endif
-                <input type="file" name="logo" accept="image/*" class="w-full border rounded px-3 py-2">
-            </div>
-        </div>
-
-        <div class="mt-8 flex justify-end">
-            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
-                Simpan Pengaturan
-            </button>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 @endsection

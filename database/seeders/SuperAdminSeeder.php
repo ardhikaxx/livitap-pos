@@ -25,31 +25,5 @@ class SuperAdminSeeder extends Seeder
 
         // Assign super-admin role
         $user->assignRole('super-admin');
-
-        // Create demo business if none exists
-        $business = Business::firstOrCreate(
-            ['slug' => 'demo-business'],
-            [
-                'name' => 'Demo Business',
-                'type' => 'retail',
-                'address' => 'Jl. Demo No. 123',
-                'phone' => '081234567890',
-                'email' => 'demo@livitap.com',
-                'is_active' => true,
-            ]
-        );
-
-        // Create demo outlet
-        $outlet = Outlet::firstOrCreate(
-            ['business_id' => $business->id, 'name' => 'Main Outlet'],
-            [
-                'address' => 'Jl. Demo No. 123',
-                'phone' => '081234567890',
-                'is_active' => true,
-            ]
-        );
-
-        // Attach user to outlet
-        $user->outlets()->syncWithoutDetaching([$outlet->id => ['is_primary' => true]]);
     }
 }

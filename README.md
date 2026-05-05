@@ -1,59 +1,298 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Livitap POS - Sistem Point of Sale untuk Usaha Retail
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**Livitap POS** adalah sistem Point of Sale (POS) lengkap yang dirancang untuk_kedai, kafe, restoran, dan usaha retail_. Sistem ini menyediakan antarmuka yang cepat dan intuitif untuk mengelola transaksi, inventaris, laporan, dan operasi toko harian.
 
-## About Laravel
+## 🌟 Fitur Utama
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### 💰 Point of Sale (POS)
+- **Antarmuka Cepat & Responsif** - Transaksi penjualan dalam hitungan detik dengan UI yang dioptimalkan untuk touchscreen
+- **Keranjang Belanja Interaktif** - Tambah/hapus item, diskon per-item atau total, service charge
+- **Multiple Payment Methods** - Tunai, kartu, QRIS, transfer, atau kombinasi
+- **Struk Customizable** - Cetak struk dengan logo dan info toko
+- **Tipe Order** - Dine-in, Takeaway, Delivery
+- **Hold & Resume** - Tunda transaksi dan lanjutkan nanti
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 📦 Manajemen Inventaris
+- **Real-time Stock Tracking** - Pantau stok toko secara real-time
+- **Stock Adjustment** - Koreksi stok manual (adjustment, damage, loss)
+- **Product Variants** - Variasi warna, ukuran, atau varian lainnya
+- **Low Stock Alerts** - Notifikasi saat stok mencapai minimum
+- **Import/Export** - Import produk dari Excel
+- **Barcode & SKU** - Generate barcode otomatis
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 👥 Manajemen Pelanggan
+- **Customer Database** - Simpan data pelanggan dengan histori pembelian
+- **Customer Groups** - Klasifikasikan pelanggan (regular, premium)
+- **Sales History** - Riwayat pembelian per-pelanggan
 
-## Learning Laravel
+### 📊 Laporan & Analytics
+- **Sales Dashboard** - Ringkasan penjualan harian, mingguan, bulanan
+- **Sales by Category** - Analisis produk terlaris
+- **Profit & Loss** - Hitung margin dan laba/rugi
+- **Tax Reports** - Laporan pajak sesuai regulasi
+- **Z-Report** - Laporan penjualan per-shift
+- **Export to Excel** - Unduh laporan dalam format Excel
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### 👤 User & Role Management
+- **Role-Based Access Control** - Tentukan hak akses berdasarkan peran (admin, kasir, manajer)
+- **Activity Logging** - Lacak semua aksi pengguna
+- **Shift Management** - Kelola shift kasir dan rekonsiliasi kas
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 💵 Cash & Finance
+- **Opening/Closing Cash** - Rekonsiliasi kas harian
+- **Cash Flow Tracking** - Pencatatan pemasukan dan pengeluaran
+- **Expense Management** - Catat biaya operasional
+- **Sales Payment Records** - Lacak pembayaran per-transaksi
 
-## Laravel Sponsors
+## 🛠️ Teknologi
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- **Backend**: Laravel 12 (PHP 8.2+)
+- **Frontend**: Blade Templates + Tailwind CSS 4
+- **JavaScript**: Vanilla JS + Axios
+- **Database**: MySQL
+- **Authentication**: Laravel Sanctum (session-based)
+- **Authorization**: Spatie Laravel Permission
+- **Excel Export**: Maatwebsite Excel
+- **Development Tools**: Laravel Pint, PHPUnit
 
-### Premium Partners
+## 📁 Struktur Project
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```
+livitap/
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/     # Controller untuk semua modul
+│   │   │   ├── POS/         # POS-specific controllers
+│   │   │   ├── ReportController.php
+│   │   │   ├── ProductController.php
+│   │   │   └── ...
+│   │   ├── Middleware/      # Custom middleware
+│   │   └── Requests/        # Form request validation
+│   ├── Models/              # Eloquent models
+│   │   ├── Sale.php
+│   │   ├── Product.php
+│   │   ├── Shift.php
+│   │   └── ...
+│   ├── Policies/            # Authorization policies
+│   ├── Observers/           # Model observers
+│   ├── Services/            # Business logic services
+│   │   ├── SaleService.php
+│   │   ├── ReportService.php
+│   │   ├── StockService.php
+│   │   └── ...
+│   └── Traits/              # Reusable traits
+├── database/
+│   ├── migrations/          # Database schema migrations
+│   └── seeders/             # Data seeders
+├── resources/
+│   └── views/
+│       ├── pos/             # POS interface (index.blade.php, receipt.blade.php)
+│       ├── reports/         # Report views
+│       ├── products/        # Product management views
+│       └── layouts/         # Master layouts
+├── routes/
+│   ├── web.php              # Web routes
+│   └── api.php              # API routes
+├── storage/
+├── public/                  # Assets (CSS, JS, images)
+└── .env.example             # Environment configuration
+```
 
-## Contributing
+## 🚀 Instalasi & Setup
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Prerequisites
+- PHP 8.2 atau lebih tinggi
+- Composer
+- Node.js & npm
+- MySQL 8.0+ atau MariaDB
+- Git
 
-## Code of Conduct
+### Langkah Instalasi
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+1. **Clone repository**
+   ```bash
+   git clone https://github.com/ardhikaxx/livitap-pos.git
+   cd livitap-pos
+   ```
 
-## Security Vulnerabilities
+2. **Install dependencies**
+   ```bash
+   composer install
+   npm install
+   ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+3. **Konfigurasi environment**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-## License
+4. **Setup database**
+   - Buat database MySQL: `livitap_pos`
+   - Edit `.env` dengan kredensial database
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+5. **Jalankan migrations**
+   ```bash
+   php artisan migrate --force
+   ```
+
+6. **Seed data demo (opsional)**
+   ```bash
+   php artisan db:seed --class=DemoDataSeeder
+   ```
+
+7. **Build assets**
+   ```bash
+   npm run build
+   ```
+
+8. **Jalankan development server**
+   ```bash
+   npm run dev
+   # atau
+   php artisan serve
+   ```
+
+9. **Akses aplikasi**
+   - Buka: http://localhost:8000
+   - Login dengan kredensial default (jika ada seeder)
+
+## 🏗️ Arsitektur Sistem
+
+### Single-Store Architecture
+Sistem ini dirancang untuk satu toko/toko tunggal dengan arsitektur sederhana namun powerful:
+
+```
+Toko (Single Store)
+├── Products (katalog produk)
+├── Sales (transaksi penjualan)
+├── Shifts (shift kerja kasir)
+├── Cash Flows (pemasukan/pengeluaran kas)
+├── Stock Movements (pergerakan stok)
+└── Reports (laporan gabungan)
+```
+
+**Perubahan Terbaru**: Sistem telah direfaktor untuk menghilangkan kompleksitas multi-outlet. Semua data now]):
+- `business_id` dihapus dari semua tabel
+- `outlet_id` dihapus dari tabel inti (sales, shifts, products, dll)
+- Middleware akses outlet dihapus/disederhanakan
+- Semua laporan menampilkan data keseluruhan toko
+
+### Database Design
+- **Normalized Schema** - Relasi antar tabel yang optimal
+- **Soft Deletes** - Data bisa di-restore jika diperlukan
+- **UUID Primary Keys** - Memberikan keamanan ekstra
+- **JSON Columns** - Untuk settings fleksibel (tax, receipt)
+
+### Service Layer Pattern
+Business logic dipisahkan ke Service classes:
+- `SaleService` - Proses transaksi penjualan
+- `ShiftService` - Manajemen shift kasir
+- `StockService` - Inventaris dan stok
+- `ReportService` - Generate laporan
+- `ReceiptService` - Generate struk
+- `PaymentService` - Proses pembayaran
+
+## 📱 Modul & Fitur Detail
+
+### 1. Point of Sale (POS)
+**Fitur lengkap kasir:**
+- Quick Sale - Transaksi tanpa login
+- Category filtering - Filter produk by kategori
+- Cart management - Tambah/hapus, edit quantity
+- Discounts - Diskonmanual atau otomatis
+- Payment splitting - Multiple payment methods
+- Change calculation - OTomatis hitung kembalian
+- Receipt printing - Cetak struk thermal printer
+
+**File utama**: `resources/views/pos/index.blade.php`
+
+### 2. Produk & Inventaris
+**Manajemen produk:**
+- Category management - Kelola kategori
+- Product variants - Warna, ukuran, dll
+- Stock tracking - Real-time stok
+- Stock adjustment - Koreksi stok manual
+- Import products - Import dari Excel
+- Barcode generation - Generate barcode
+
+**Models**: `Product`, `ProductPrice`, `ProductStock`, `ProductVariant`
+
+### 3. Transaksi Penjualan
+**Proses penjualan:**
+- New sale - Buat transaksi baru
+- Sale items - Tambah produk ke keranjang
+- Payment processing - Proses pembayaran
+- Invoice generation - Buat invoice number
+- Sale history - Riwayat transaksi
+
+**Models**: `Sale`, `SaleItem`, `SalePayment`
+
+### 4. Shift & Cash Management
+**Kel
+- Shift opening - Buka kas dengan nominal awal
+- Shift closing - Tutup kas, rekonsiliasi
+- Cash flow - Pemasukan/pengeluaran during shift
+- Expected vs actual - Bandingkan kas seharusnya vs aktual
+
+**Models**: `Shift`, `CashFlow`
+
+### 5. Laporan
+**Reports available:**
+- Sales report - Penjualan by period
+- Top products - Produk terlaris
+- Payment summary - Ringkasan pembayaran
+- Tax report - Laporan pajak
+- Z-report - Laporan shift harian
+
+**Controller**: `ReportController`  
+**Service**: `ReportService`
+
+### 6. User & Permissions
+**User management:**
+- Role-based access - Admin, Kasir, Manajer
+- Permissions - Control akses per-modul
+- Activity logging - Track user actions
+- User profile - Edit profil
+
+**Package**: Spatie Laravel Permission
+
+## 🔄 Status Refactor (Mei 2026)
+
+Sistem sedang dalam proses refactor untuk:
+
+✅ **Sudah selesai:**
+- Remove `business_id` dari semua tabel kecuali yang diperlukan
+- Remove `outlet_id` dari sales, shifts, products, stocks
+- Update semua model untuk tanpa outlet restriction
+- Simplify middleware
+
+🔄 **Proses:**
+- Clean up unused code (old outlet-related)
+- Update所有laporan untuk single-store
+
+⏳ **Akan datang:**
+- Improved reporting aggregation
+- Better single-store optimizations
+
+## 📝 Catatan Penting
+
+1. **Tidak Multi-Outlet**: Sistem sekarang **hanya untuk single store**. Jika membutuhkan multi-outlet di masa depan, perlu architecture baru.
+2. **Database**: Pastikan migrasi dijalankan setelah clone
+3. **Seeders**: DemoDataSeeder masih bekerja, CafeProductSeeder dihapus
+4. **UUID**: Semua primary key menggunakan UUID
+
+## 🐛 Troubleshooting
+
+**Migration errors**: Pastikan database kosong atau jalankan migrate:fresh  
+**Permission denied**: `chmod -R 755 storage bootstrap/cache`  
+**Composer issues**: `composer dump-autoload`  
+**Asset not loading**: `npm run build` atau `npm run dev`
+
+## 📞 Support
+
+Untuk pertanyaan atau issues, buat GitHub issue di repository ini.
+
+---
+
+**Livitap POS v1.0.0** | Dibuat dengan Laravel 12

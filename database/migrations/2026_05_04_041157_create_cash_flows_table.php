@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('cash_flows', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('shift_id')->constrained()->onDelete('cascade');
             $table->foreignUuid('user_id')->constrained()->onDelete('cascade');
             $table->enum('type', ['in', 'out']);
             $table->decimal('amount', 15, 2);

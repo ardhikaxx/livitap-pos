@@ -5,7 +5,6 @@ namespace App\Http\Controllers\POS;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
-use App\Models\Shift;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -16,11 +15,7 @@ class DashboardController extends Controller
         
         $categories = Category::all();
         
-        $activeShift = Shift::where('user_id', auth()->id())
-            ->where('status', 'open')
-            ->first();
-
-        return view('pos.index', compact('products', 'categories', 'activeShift'));
+        return view('pos.index', compact('products', 'categories'));
     }
 
     public function getProduct(Product $product)

@@ -42,7 +42,6 @@ class Kernel extends HttpKernel
         'auth' => \Illuminate\Auth\Middleware\Authenticate::class,
         'check.business' => \App\Http\Middleware\CheckBusinessActive::class,
         'check.outlet' => \App\Http\Middleware\CheckOutletAccess::class,
-        'check.shift' => \App\Http\Middleware\CheckShiftOpen::class,
         'set.outlet' => \App\Http\Middleware\SetActiveOutlet::class,
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
         'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,

@@ -11,14 +11,11 @@ return new class extends Migration
         // 1. Drop shifts table
         Schema::dropIfExists('shifts');
 
-        // 2. Remove shift_id from sales
+        // 2. Remove shift_id from sales if exists
         Schema::table('sales', function (Blueprint $table) {
-            $table->dropColumn('shift_id');
-        });
-
-        // 3. Remove shift_id from cash_flows
-        Schema::table('cash_flows', function (Blueprint $table) {
-            $table->dropColumn('shift_id');
+            if (Schema::hasColumn('sales', 'shift_id')) {
+                $table->dropColumn('shift_id');
+            }
         });
     }
 

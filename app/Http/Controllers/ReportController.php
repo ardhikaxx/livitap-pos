@@ -24,16 +24,15 @@ class ReportController extends Controller
     {
         $from = $request->date_from ? \Carbon\Carbon::parse($request->date_from)->startOfDay() : \Carbon\Carbon::today()->startOfMonth();
         $to = $request->date_to ? \Carbon\Carbon::parse($request->date_to)->endOfDay() : \Carbon\Carbon::today()->endOfDay();
-        $outletId = session('outlet_id');
 
-        $report = $this->reportService->salesReport($from, $to, $outletId, $request->user_id);
+        $report = $this->reportService->salesReport($from, $to, $request->user_id);
 
         $sales = $report['sales'];
         $summary = $report['summary'];
         $paymentMethods = $report['payment_methods'];
         $topProducts = $report['top_products'];
 
-        $users = \App\Models\User::where('business_id', auth()->user()->business_id)->get();
+        $users = \App\Models\User::all();
 
         return view('reports.sales', compact(
             'sales', 
@@ -48,8 +47,7 @@ class ReportController extends Controller
 
     public function products(Request $request)
     {
-        $outletId = session('outlet_id');
-        $report = $this->reportService->stockReport($outletId);
+        $report = $this->reportService->stockReport();
 
         $stocks = $report['stocks'];
         $summary = $report['summary'];
@@ -59,8 +57,7 @@ class ReportController extends Controller
 
     public function stock()
     {
-        $outletId = session('outlet_id');
-        $report = $this->reportService->stockReport($outletId);
+        $report = $this->reportService->stockReport();
 
         return view('reports.stock', $report);
     }
@@ -71,7 +68,6 @@ class ReportController extends Controller
         $to = $request->date_to ? \Carbon\Carbon::parse($request->date_to) : \Carbon\Carbon::today();
 
         $shifts = Shift::with(['user', 'sales', 'cashFlows'])
-            ->where('outlet_id', session('outlet_id'))
             ->whereBetween('opened_at', [$from, $to])
             ->orderBy('opened_at', 'desc')
             ->paginate(20);
@@ -108,11 +104,11 @@ class ReportController extends Controller
             case 'sales':
                 $from = $request->date_from ? \Carbon\Carbon::parse($request->date_from) : \Carbon\Carbon::today()->startOfMonth();
                 $to = $request->date_to ? \Carbon\Carbon::parse($request->date_to) : \Carbon\Carbon::today();
-                $report = $this->reportService->salesReport($from, $to, session('outlet_id'));
+                $report = $this->reportService->salesReport($from, $to);
                 $data = $report['sales'];
                 break;
             case 'stock':
-                $report = $this->reportService->stockReport(session('outlet_id'));
+                $report = $this->reportService->stockReport();
                 $data = $report['stocks'];
                 break;
         }
@@ -130,8 +126,7 @@ class ReportController extends Controller
 
     public function dashboard()
     {
-        $outletId = session('outlet_id') ?? 1;
-        $summary = $this->reportService->dashboardSummary($outletId);
+        $summary = $this->reportService->dashboardSummary();
 
         return view('dashboard', $summary);
     }

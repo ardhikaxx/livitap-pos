@@ -12,12 +12,11 @@ class StockService
     /**
      * Penyesuaian stok
      */
-    public function adjustStock($productId, $outletId, $qtyChange, $type, $userId, $notes = null, $variantId = null)
+    public function adjustStock($productId, $qtyChange, $type, $userId, $notes = null, $variantId = null)
     {
-        return DB::transaction(function () use ($productId, $outletId, $qtyChange, $type, $userId, $notes, $variantId) {
+        return DB::transaction(function () use ($productId, $qtyChange, $type, $userId, $notes, $variantId) {
             $stock = ProductStock::firstOrCreate([
                 'product_id' => $productId,
-                'outlet_id' => $outletId,
                 'variant_id' => $variantId,
             ], ['qty' => 0]);
 
@@ -28,7 +27,6 @@ class StockService
             // Catat pergerakan stok
             StockMovement::create([
                 'product_id' => $productId,
-                'outlet_id' => $outletId,
                 'variant_id' => $variantId,
                 'type' => $type,
                 'reference_type' => null,
@@ -41,29 +39,6 @@ class StockService
             ]);
 
             return $stock;
-        });
-    }
-
-    /**
-     * Transfer stok antar outlet
-     */
-    public function transferStock($productId, $fromOutletId, $toOutletId, $qty, $userId, $notes = null, $variantId = null)
-    {
-        return DB::transaction(function () use ($productId, $fromOutletId, $toOutletId, $qty, $userId, $notes, $variantId) {
-            // Kurangi stok dari outlet asal
-            $fromStock = ProductStock::where('product_id', $productId)
-                ->where('outlet_id', $fromOutletId)
-                ->where('variant_id', $variantId)
-                ->first();
-
-            if (!$fromStock || $fromStock->qty < $qty) {
-                throw new \Exception("Stok tidak cukup di outlet asal");
-            }
-
-            $this->adjustStock($productId, $fromOutletId, -$qty, 'transfer', $userId, $notes, $variantId);
-            $this->adjustStock($productId, $toOutletId, $qty, 'transfer', $userId, $notes, $variantId);
-
-            return true;
         });
     }
 
@@ -87,7 +62,6 @@ class StockService
                 // Update stok
                 $stock = ProductStock::firstOrCreate([
                     'product_id' => $item->product_id,
-                    'outlet_id' => $opname->outlet_id,
                     'variant_id' => $item->variant_id,
                 ], ['qty' => 0]);
 
@@ -97,7 +71,6 @@ class StockService
                 // Catat pergerakan
                 StockMovement::create([
                     'product_id' => $item->product_id,
-                    'outlet_id' => $opname->outlet_id,
                     'variant_id' => $item->variant_id,
                     'type' => 'opname',
                     'reference_type' => 'App\Models\StockOpname',
@@ -123,10 +96,9 @@ class StockService
     /**
      * Cek stok minimum
      */
-    public function checkLowStock($outletId)
+    public function checkLowStock()
     {
         $lowStocks = ProductStock::with('product')
-            ->where('outlet_id', $outletId)
             ->whereColumn('qty', '<=', 'min_qty')
             ->where('min_qty', '>', 0)
             ->get();

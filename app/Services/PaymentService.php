@@ -37,7 +37,7 @@ class PaymentService
             $sale->update([
                 'paid_amount' => $totalPaid,
                 'change_amount' => $totalPaid - $sale->total,
-                'status' => 'paid',
+                'status' => Sale::STATUS_PAID,
             ]);
 
             return $sale;
@@ -93,7 +93,7 @@ class PaymentService
 
             // Update status jika full refund
             if ($sale->paid_amount - $amount <= 0) {
-                $sale->update(['status' => 'refunded']);
+                $sale->update(['status' => Sale::STATUS_REFUNDED]);
             }
 
             return $sale;

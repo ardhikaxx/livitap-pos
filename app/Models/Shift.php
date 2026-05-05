@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Shift extends Model
 {
     protected $fillable = [
-        'outlet_id', 'user_id', 'status', 'opened_at', 'closed_at',
+        'user_id', 'status', 'opened_at', 'closed_at',
         'opening_cash', 'closing_cash', 'expected_cash', 'difference', 'notes'
     ];
 
@@ -21,11 +21,6 @@ class Shift extends Model
         'expected_cash' => 'decimal:2',
         'difference' => 'decimal:2',
     ];
-
-    public function outlet(): BelongsTo
-    {
-        return $this->belongsTo(Outlet::class);
-    }
 
     public function user(): BelongsTo
     {

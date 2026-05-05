@@ -15,16 +15,17 @@
         .footer { text-align: center; margin-top: 20px; font-size: 10px; }
     </style>
 </head>
-<body onload="window.print()">
+<body onload="printAndRedirect()">
+    <script>
+        function printAndRedirect() {
+            window.print();
+            window.location.href = "{{ route('pos.index') }}";
+        }
+    </script>
     <div class="header">
-        <h2>{{ $sale->outlet->business->name ?? 'LIVITAP POS' }}</h2>
-        <p>{{ $sale->outlet->business->address ?? '' }}</p>
-        <p>Telp: {{ $sale->outlet->business->phone ?? '' }}</p>
-        @if(isset($outlet) && $outlet->receipt_settings['show_logo'] ?? true)
-            @if($sale->outlet->business->logo)
-                <img src="{{ asset('storage/' . $sale->outlet->business->logo) }}" height="40">
-            @endif
-        @endif
+        <h2>LIVITAP POS</h2>
+        <p>{{ session('business_address') ?? 'Alamat bisnis' }}</p>
+        <p>Telp: {{ session('business_phone') ?? '' }}</p>
     </div>
 
     <div class="info">
@@ -87,7 +88,7 @@
             <span>Rp {{ number_format($sale->change_amount, 0, ',', '.') }}</span>
         </div>
 
-        @if($sale->payments->count() > 0 && ($outlet->receipt_settings['show_payment_method'] ?? true))
+        @if($sale->payments->count() > 0)
         <div style="margin-top: 10px; border-top: 1px dotted #000; padding-top: 5px;">
             <p><strong>Pembayaran:</strong></p>
             @foreach($sale->payments as $payment)
@@ -105,7 +106,7 @@
 
     <div class="footer">
         <p>Terima kasih atas kunjungan Anda!</p>
-        <p>{{ $sale->outlet->business->npwp ?? '' }}</p>
+        <p>{{ session('business_npwp') ?? '' }}</p>
     </div>
 </body>
 </html>

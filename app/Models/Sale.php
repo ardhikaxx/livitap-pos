@@ -11,10 +11,16 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 class Sale extends Model
 {
     use SoftDeletes, HasUuids;
-    use SoftDeletes, HasUuids;
+
+    const STATUS_PAID = 'paid';
+    const STATUS_PARTIAL = 'partial';
+    const STATUS_UNPAID = 'unpaid';
+    const STATUS_VOID = 'void';
+    const STATUS_PENDING = 'pending';
+    const STATUS_REFUNDED = 'refunded';
 
     protected $fillable = [
-        'outlet_id', 'user_id', 'customer_id', 'invoice_number', 'type', 'status',
+        'user_id', 'customer_id', 'invoice_number', 'type', 'status',
         'sale_date', 'subtotal', 'discount_amount', 'tax_amount', 'total',
         'paid_amount', 'change_amount', 'notes', 'table_id', 'order_type', 'shift_id'
     ];
@@ -62,11 +68,6 @@ class Sale extends Model
     public function table(): BelongsTo
     {
         return $this->belongsTo(Table::class);
-    }
-
-    public function scopeForOutlet($query, $outletId)
-    {
-        return $query->where('outlet_id', $outletId);
     }
 
     public function scopeInPeriod($query, $from, $to)

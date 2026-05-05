@@ -18,12 +18,18 @@ class SaleController extends Controller
 
     public function store(Request $request)
     {
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthenticated'
+            ], 401);
+        }
+
         try {
-            // Karena POS menggunakan fetch JSON, kita gunakan request raw
-            // Pastikan data valid
             $data = $request->all();
             
-            $sale = $this->saleService->createSale($data, auth()->user());
+            $sale = $this->saleService->createSale($data, null, $user);
             
             return response()->json([
                 'success' => true,
@@ -43,7 +49,7 @@ class SaleController extends Controller
 
     public function receipt($id)
     {
-        $sale = Sale::with(['items.product', 'user', 'outlet.business', 'payments'])->findOrFail($id);
+        $sale = Sale::with(['items.product', 'user', 'payments'])->findOrFail($id);
         return view('pos.receipt', compact('sale'));
     }
 
@@ -74,11 +80,19 @@ class SaleController extends Controller
 
     public function hold(Request $request)
     {
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthenticated'
+            ], 401);
+        }
+
         $request->validate([
             'cart' => 'required|array',
         ]);
 
-        $held = $this->saleService->holdCart($request->cart, session('outlet_id'), auth()->id());
+        $held = $this->saleService->holdCart($request->cart, $user->id);
 
         return response()->json([
             'success' => true,
@@ -89,7 +103,15 @@ class SaleController extends Controller
 
     public function holds()
     {
-        $heldCarts = $this->saleService->getHeldCarts(auth()->id());
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthenticated'
+            ], 401);
+        }
+
+        $heldCarts = $this->saleService->getHeldCarts($user->id);
         return response()->json([
             'success' => true,
             'data' => $heldCarts,
@@ -98,12 +120,17 @@ class SaleController extends Controller
 
     public function void(Sale $sale, Request $request)
     {
+        $user = auth()->user();
+        if (!$user) {
+            return back()->with('error', 'Unauthenticated');
+        }
+
         $request->validate([
             'reason' => 'required|string|max:500',
         ]);
 
         try {
-            $voidedSale = $this->saleService->voidSale($sale, $request->reason, auth()->id());
+            $voidedSale = $this->saleService->voidSale($sale, $request->reason, $user->id);
             return back()->with('success', 'Transaksi berhasil di-void');
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());

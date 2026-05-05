@@ -11,20 +11,19 @@ class ShiftService
     /**
      * Buka shift kasir
      */
-    public function openShift($user, $openingCash, $outletId)
+    public function openShift($user, $openingCash)
     {
-        return DB::transaction(function () use ($user, $openingCash, $outletId) {
-            // Validasi tidak ada shift open lain untuk outlet ini
-            $openShift = Shift::where('outlet_id', $outletId)
+        return DB::transaction(function () use ($user, $openingCash) {
+            // Validasi tidak ada shift open lain
+            $openShift = Shift::where('user_id', $user->id)
                 ->where('status', 'open')
                 ->first();
                 
             if ($openShift) {
-                throw new \Exception("Outlet masih memiliki shift terbuka. Tutup dahulu.");
+                throw new \Exception("Kasir masih memiliki shift terbuka. Tutup dahulu.");
             }
 
             return Shift::create([
-                'outlet_id' => $outletId,
                 'user_id' => $user->id,
                 'status' => 'open',
                 'opened_at' => Carbon::now(),

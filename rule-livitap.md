@@ -574,7 +574,7 @@ goods_receipt_items (id, goods_receipt_id, purchase_order_item_id, product_id, v
 customers (id, business_id, name, phone, email, address, gender, birthdate, photo, tier[regular|silver|gold|platinum], points, credit_limit, notes, is_active, created_at, updated_at, deleted_at)
 
 -- Transaksi Penjualan
-sales (id:uuid, outlet_id, user_id, customer_id:nullable, invoice_number, type[sale|refund], status[paid|partial|unpaid|void], sale_date, subtotal, discount_amount, tax_amount, total, paid_amount, change_amount, notes, table_id:nullable, order_type[dine_in|takeaway|delivery], shift_id, created_at, updated_at)
+sales (id:uuid, outlet_id, user_id, customer_id:nullable, invoice_number, type[sale|refund], status[paid|partial|unpaid|void|pending|refunded], sale_date, subtotal, discount_amount, tax_amount, total, paid_amount, change_amount, notes, table_id:nullable, order_type[dine_in|takeaway|delivery], shift_id, created_at, updated_at)
 
 -- Item Transaksi
 sale_items (id, sale_id, product_id, variant_id, name_snapshot, sku_snapshot, qty, unit_price, discount_amount, tax_amount, subtotal, buy_price, notes)

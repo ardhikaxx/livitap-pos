@@ -10,8 +10,6 @@ return new class extends Migration
     {
         Schema::create('purchase_orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('business_id')->constrained()->onDelete('cascade');
-            $table->foreignId('outlet_id')->constrained()->onDelete('cascade');
             $table->foreignId('supplier_id')->constrained()->onDelete('cascade');
             $table->string('po_number')->unique();
             $table->enum('status', ['draft', 'sent', 'partial', 'received', 'cancelled'])->default('draft');

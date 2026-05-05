@@ -16,7 +16,7 @@ class BusinessPolicy
     public function view(User $user, Business $business)
     {
         return $user->hasRole('super-admin') || 
-               ($user->hasRole('owner') && $business->id == $user->business_id);
+               ($user->hasRole('owner') && $user->business_id && $business->id == $user->business_id);
     }
 
     public function create(User $user)
@@ -27,7 +27,7 @@ class BusinessPolicy
     public function update(User $user, Business $business)
     {
         return $user->hasRole('super-admin') || 
-               ($user->hasRole('owner') && $business->id == $user->business_id);
+               ($user->hasRole('owner') && $user->business_id && $business->id == $user->business_id);
     }
 
     public function delete(User $user, Business $business)

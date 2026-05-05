@@ -4,16 +4,9 @@ namespace App\Services;
 
 use App\Models\Sale;
 use App\Models\SaleItem;
-use App\Models\Product;
 use App\Models\ProductStock;
 use App\Models\StockMovement;
 use App\Models\Shift;
-use App\Models\PointTransaction;
-use App\Models\Customer;
-use App\Services\StockService;
-use App\Services\DiscountService;
-use App\Services\PaymentService;
-use App\Services\PointService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -21,32 +14,32 @@ use Carbon\Carbon;
 
 class SaleService
 {
-    public function __construct(
-        private StockService $stockService,
-        private DiscountService $discountService,
-        private PaymentService $paymentService,
-        private PointService $pointService
-    ) {}
+    protected $pointService;
 
-    public function createSale(array $data, $user)
+    public function __construct(PointService $pointService)
     {
-        return DB::transaction(function () use ($data, $user) {
-            $outletId = $data['outlet_id'];
-            
-            // Validate shift
+        $this->pointService = $pointService;
+    }
+
+    /**
+     * Create transaksi baru
+     */
+    public function createSale(array $data, $outletId, $user)
+    {
+        return DB::transaction(function () use ($data, $outletId, $user) {
+            if (!$user) {
+                throw new \Exception("User tidak terautentikasi");
+            }
+
+            // Get active shift
             $shift = Shift::where('user_id', $user->id)
-                ->where('outlet_id', $outletId)
                 ->where('status', 'open')
                 ->first();
 
-            if (!$shift) {
-                throw new \Exception("Shift belum dibuka. Buka shift terlebih dahulu.");
-            }
-
-            // Calculate subtotal
+            // Calculate totals
             $subtotal = 0;
             foreach ($data['items'] as $item) {
-                $subtotal += ($item['price'] * $item['qty']);
+                $subtotal += $item['price'] * $item['qty'];
             }
 
             $discountAmount = $data['discount_amount'] ?? 0;
@@ -63,20 +56,19 @@ class SaleService
             // Process Customer
             $customerId = $data['customer_id'] ?? null;
             if (!$customerId && isset($data['customer_name'])) {
-                $customer = \App\Models\Customer::firstOrCreate([
-                    'name' => $data['customer_name'],
-                    'business_id' => $user->business_id,
-                ]);
+                $customer = \App\Models\Customer::firstOrCreate(
+                    ['name' => $data['customer_name']],
+                    ['name' => $data['customer_name']]
+                );
                 $customerId = $customer->id;
             }
 
             // Create Sale
             $sale = Sale::create([
                 'id' => Str::uuid(),
-                'outlet_id' => $outletId,
                 'user_id' => $user->id,
                 'customer_id' => $customerId,
-                'shift_id' => $shift->id,
+                'shift_id' => $shift?->id,
                 'invoice_number' => $invoiceNumber,
                 'sale_date' => now(),
                 'subtotal' => $subtotal,
@@ -87,7 +79,7 @@ class SaleService
                 'change_amount' => 0,
                 'table_id' => $data['table_id'] ?? null,
                 'order_type' => $data['order_type'] ?? 'takeaway',
-                'status' => 'pending',
+                'status' => Sale::STATUS_PENDING,
             ]);
 
             // Create Sale Items & Validate Stock
@@ -98,19 +90,15 @@ class SaleService
                     throw new \Exception("Produk tidak ditemukan: ID {$item['product_id']}");
                 }
 
-                // Validate stock if tracking
+                // Validate stock if tracking (no outlet restriction)
                 if ($product->track_stock) {
-                    $stockQuery = ProductStock::where('product_id', $item['product_id'])
-                        ->where('outlet_id', $outletId);
+                    $stock = ProductStock::where('product_id', $item['product_id'])
+                        ->where('qty', '>=', $item['qty'])
+                        ->first();
                     
-                    if (isset($item['variant_id'])) {
-                        $stockQuery->where('variant_id', $item['variant_id']);
-                    }
-
-                    $stock = $stockQuery->first();
-
-                    if (!$stock || $stock->qty < $item['qty']) {
-                        throw new \Exception("Stok {$product->name} tidak mencukupi. Tersisa: " . ($stock?->qty ?? 0));
+                    if (!$stock) {
+                        $availableQty = ProductStock::where('product_id', $item['product_id'])->sum('qty');
+                        throw new \Exception("Stok {$product->name} tidak mencukupi. Tersisa: " . $availableQty);
                     }
 
                     // Decrement stock & create movement
@@ -119,7 +107,6 @@ class SaleService
 
                     StockMovement::create([
                         'product_id' => $item['product_id'],
-                        'outlet_id' => $outletId,
                         'variant_id' => $item['variant_id'] ?? null,
                         'type' => 'sale',
                         'reference_type' => Sale::class,
@@ -149,27 +136,24 @@ class SaleService
             }
 
             // Process payments if provided
-            if (isset($data['payments']) && is_array($data['payments'])) {
-                $totalPaid = collect($data['payments'])->sum('amount');
+            if (isset($data['payment_method']) && isset($data['paid_amount'])) {
+                $totalPaid = $data['paid_amount'];
                 
                 if ($totalPaid < $total) {
                     throw new \Exception("Pembayaran tidak mencukupi. Kekurangan: Rp " . ($total - $totalPaid));
                 }
 
-                foreach ($data['payments'] as $payment) {
-                    \App\Models\SalePayment::create([
-                        'sale_id' => $sale->id,
-                        'method' => $payment['method'],
-                        'amount' => $payment['amount'],
-                        'reference_number' => $payment['reference_number'] ?? null,
-                        'notes' => $payment['notes'] ?? null,
-                    ]);
-                }
+                \App\Models\SalePayment::create([
+                    'sale_id' => $sale->id,
+                    'method' => $data['payment_method'],
+                    'amount' => $totalPaid,
+                    'notes' => 'Payment for sale ' . $invoiceNumber,
+                ]);
 
                 $sale->update([
                     'paid_amount' => $totalPaid,
                     'change_amount' => $totalPaid - $total,
-                    'status' => 'paid',
+                    'status' => Sale::STATUS_PAID,
                 ]);
             }
 
@@ -187,7 +171,7 @@ class SaleService
      */
     public function voidSale(Sale $sale, $reason, $userId)
     {
-        if ($sale->status === 'void') {
+        if ($sale->status === Sale::STATUS_VOID) {
             throw new \Exception("Transaksi sudah di-void");
         }
 
@@ -213,7 +197,6 @@ class SaleService
             foreach ($sale->items as $item) {
                 if ($item->product->track_stock) {
                     $stock = ProductStock::where('product_id', $item->product_id)
-                        ->where('outlet_id', $sale->outlet_id)
                         ->first();
 
                     if ($stock) {
@@ -226,7 +209,7 @@ class SaleService
             $this->pointService->voidPoints($sale);
 
             // Mark as void
-            $sale->update(['status' => 'void']);
+            $sale->update(['status' => Sale::STATUS_VOID]);
 
             return $sale;
         });
@@ -235,31 +218,21 @@ class SaleService
     /**
      * Hold transaksi (tahan pesanan)
      */
-    public function holdCart(array $cart, $outletId, $userId)
-    {
-        // Simpan ke session atau database
-        $holdData = [
-            'cart' => $cart,
-            'outlet_id' => $outletId,
-            'user_id' => $userId,
-            'held_at' => now(),
-        ];
-
-        $holds = session()->get('held_carts', []);
-        $holds[] = $holdData;
-        session()->put('held_carts', $holds);
-
-        return $holdData;
-    }
-
-    /**
-     * Retrieve held carts
-     */
     public function getHeldCarts($userId)
     {
-        return collect(session()->get('held_carts', []))
-            ->where('user_id', $userId)
-            ->values()
-            ->all();
+        return session()->get("held_carts_{$userId}", []);
+    }
+
+    public function holdCart(array $cart, $userId)
+    {
+        $heldCarts = session()->get("held_carts_{$userId}", []);
+        $heldCarts[] = [
+            'id' => Str::uuid(),
+            'cart' => $cart,
+            'created_at' => now()->toDateTimeString(),
+        ];
+        session()->put("held_carts_{$userId}", $heldCarts);
+
+        return end($heldCarts);
     }
 }

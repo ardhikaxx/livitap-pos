@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('shifts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('outlet_id')->constrained()->onDelete('cascade');
             $table->foreignUuid('user_id')->constrained()->onDelete('cascade');
             $table->enum('status', ['open', 'closed', 'forced_closed'])->default('open');
             $table->timestamp('opened_at');
@@ -25,7 +24,7 @@ return new class extends Migration
             $table->text('notes')->nullable();
             $table->timestamps();
 
-            $table->index(['outlet_id', 'status']);
+            $table->index('status');
             $table->index('user_id');
         });
     }

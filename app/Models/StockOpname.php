@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class StockOpname extends Model
 {
     protected $fillable = [
-        'outlet_id', 'status', 'notes', 'opened_by', 'closed_by', 'opened_at', 'closed_at'
+        'status', 'notes', 'opened_by', 'closed_by', 'opened_at', 'closed_at'
     ];
 
     protected $casts = [
@@ -17,11 +17,6 @@ class StockOpname extends Model
         'closed_at' => 'datetime',
         'status' => 'string',
     ];
-
-    public function outlet(): BelongsTo
-    {
-        return $this->belongsTo(Outlet::class);
-    }
 
     public function openedBy(): BelongsTo
     {

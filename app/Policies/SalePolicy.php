@@ -15,10 +15,9 @@ class SalePolicy
 
     public function view(User $user, Sale $sale)
     {
-        // User bisa lihat sale jika di outlet yang sama atau memiliki role tertentu
         return $user->hasRole('super-admin') || 
                $user->hasRole('owner') ||
-               ($user->hasRole('manager') && $sale->outlet_id == $user->primaryOutlet?->id) ||
+               $user->hasRole('manager') ||
                ($user->hasRole('kasir') && $sale->user_id == $user->id);
     }
 

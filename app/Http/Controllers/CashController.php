@@ -25,7 +25,6 @@ class CashController extends Controller
         }
 
         $cashFlow = CashFlow::create([
-            'outlet_id' => session('outlet_id'),
             'shift_id' => $shift->id,
             'user_id' => auth()->id(),
             'type' => 'in',

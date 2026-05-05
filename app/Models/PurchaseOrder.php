@@ -9,9 +9,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class PurchaseOrder extends Model
 {
     protected $fillable = [
-        'business_id', 'outlet_id', 'supplier_id', 'po_number', 'status',
-        'order_date', 'expected_date', 'notes', 'subtotal', 'discount', 'tax', 'total',
-        'approved_by', 'approved_at', 'created_by'
+        'supplier_id', 'po_number', 'status',
+        'order_date', 'expected_date', 'notes', 'subtotal',
+        'discount', 'tax', 'total', 'approved_by', 'approved_at',
+        'created_by'
     ];
 
     protected $casts = [
@@ -27,11 +28,6 @@ class PurchaseOrder extends Model
     public function business(): BelongsTo
     {
         return $this->belongsTo(Business::class);
-    }
-
-    public function outlet(): BelongsTo
-    {
-        return $this->belongsTo(Outlet::class);
     }
 
     public function supplier(): BelongsTo

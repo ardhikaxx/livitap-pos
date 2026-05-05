@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class ProductPrice extends Model
 {
     protected $fillable = [
-        'product_id', 'outlet_id', 'buy_price', 'sell_price', 'min_price'
+        'product_id', 'buy_price', 'sell_price', 'min_price'
     ];
 
     protected $casts = [
@@ -20,10 +20,5 @@ class ProductPrice extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
-    }
-
-    public function outlet(): BelongsTo
-    {
-        return $this->belongsTo(Outlet::class);
     }
 }

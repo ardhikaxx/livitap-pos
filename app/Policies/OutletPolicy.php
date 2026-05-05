@@ -16,7 +16,7 @@ class OutletPolicy
     public function view(User $user, Outlet $outlet)
     {
         return $user->hasRole('super-admin') || 
-               $user->hasRole('owner') && $outlet->business_id == $user->business_id ||
+               $user->hasRole('owner') && $user->business_id && $outlet->business_id == $user->business_id ||
                $user->hasRole('manager') && $outlet->id == $user->primaryOutlet?->id;
     }
 

@@ -11,7 +11,6 @@ return new class extends Migration
         Schema::create('stock_movements', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
-            $table->foreignId('outlet_id')->constrained()->onDelete('cascade');
             $table->unsignedBigInteger('variant_id')->nullable();
             $table->enum('type', ['purchase', 'sale', 'adjustment', 'transfer', 'opname', 'return']);
             $table->string('reference_type')->nullable();
@@ -24,12 +23,11 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index(['reference_type', 'reference_id']);
-            $table->index(['product_id', 'outlet_id']);
+            $table->index('product_id');
         });
 
         Schema::create('discounts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('business_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->enum('type', ['percentage', 'nominal', 'bogo', 'bundle']);
             $table->decimal('value', 15, 2);
@@ -56,50 +54,10 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
-
-        Schema::create('tables', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('outlet_id')->constrained()->onDelete('cascade');
-            $table->string('name');
-            $table->integer('capacity')->default(4);
-            $table->string('area')->nullable();
-            $table->string('qr_code')->nullable()->unique();
-            $table->enum('status', ['empty', 'occupied', 'reserved', 'requesting_bill'])->default('empty');
-            $table->uuid('current_sale_id')->nullable();
-            $table->integer('sort_order')->default(0);
-            $table->timestamps();
-
-            $table->foreign('current_sale_id')->references('id')->on('sales')->onDelete('set null');
-        });
-
-        Schema::create('kitchen_orders', function (Blueprint $table) {
-            $table->id();
-            $table->uuid('sale_id');
-            $table->foreignId('table_id')->nullable()->constrained()->onDelete('set null');
-            $table->enum('status', ['pending', 'processing', 'ready', 'served', 'cancelled'])->default('pending');
-            $table->text('notes')->nullable();
-            $table->timestamp('printed_at')->nullable();
-            $table->timestamps();
-
-            $table->foreign('sale_id')->references('id')->on('sales')->onDelete('cascade');
-        });
-
-        Schema::create('outlet_user', function (Blueprint $table) {
-            $table->id();
-            $table->foreignUuid('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('outlet_id')->constrained()->onDelete('cascade');
-            $table->boolean('is_primary')->default(false);
-            $table->timestamps();
-
-            $table->unique(['user_id', 'outlet_id']);
-        });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('outlet_user');
-        Schema::dropIfExists('kitchen_orders');
-        Schema::dropIfExists('tables');
         Schema::dropIfExists('vouchers');
         Schema::dropIfExists('discounts');
         Schema::dropIfExists('stock_movements');

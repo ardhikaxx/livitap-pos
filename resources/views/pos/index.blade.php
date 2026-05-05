@@ -106,6 +106,12 @@
         max-width: 440px;
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     }
+
+    @media print {
+        body * { visibility: hidden; }
+        #receipt-content, #receipt-content * { visibility: visible; }
+        #receipt-content { position: absolute; left: 0; top: 0; width: 100%; }
+    }
 </style>
 @endpush
 
@@ -269,9 +275,9 @@
         </div>
 
         <div class="d-flex gap-3">
-            <button onclick="printReceipt()" class="btn btn-outline-primary flex-fill py-2 fw-bold">
+            <a id="btn-print-receipt" href="#" class="btn btn-outline-primary flex-fill py-2 fw-bold text-decoration-none">
                 <i class="bi bi-printer me-2"></i> Cetak Struk
-            </button>
+            </a>
             <button onclick="newTransaction()" class="btn btn-primary flex-fill py-2 fw-bold">
                 Transaksi Baru
             </button>
@@ -422,7 +428,6 @@ function executePayment() {
         },
         body: JSON.stringify({
             customer_name: tempCustomerName,
-            outlet_id: {{ session('outlet_id', 1) }},
             items: cart.map(item => ({ product_id: item.id, qty: item.qty, price: item.price })),
             subtotal: cartTotal,
             total: cartTotal,
@@ -451,6 +456,8 @@ function executePayment() {
                     + '<div class="fw-bold">' + fmt(item.price * item.qty) + '</div>';
                 container.appendChild(itemDiv);
             });
+            var printLink = '{{ route("pos.receipt", ":id") }}'.replace(':id', data.data.id);
+            document.getElementById('btn-print-receipt').href = printLink;
             
             document.getElementById('receipt-modal').style.display = 'flex';
         } else {

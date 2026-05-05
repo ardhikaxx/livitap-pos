@@ -13,7 +13,7 @@ class Outlet extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'business_id', 'name', 'address', 'phone', 'logo', 'tax_settings', 'receipt_settings', 'is_active'
+        'name', 'address', 'phone', 'logo', 'tax_settings', 'receipt_settings', 'is_active'
     ];
 
     protected $casts = [

@@ -24,10 +24,13 @@ class SettingsController extends Controller
             }
         }
 
-        if (!$currentBusiness && auth()->user()->business_id) {
-            $currentBusiness = auth()->user()->business;
-            if ($currentBusiness) {
-                session(['business_id' => $currentBusiness->id]);
+        if (!$currentBusiness) {
+            $user = auth()->user();
+            if ($user && $user->business_id) {
+                $currentBusiness = $user->business;
+                if ($currentBusiness) {
+                    session(['business_id' => $currentBusiness->id]);
+                }
             }
         }
 

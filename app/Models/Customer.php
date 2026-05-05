@@ -22,6 +22,13 @@ class Customer extends Model
         'is_active' => 'boolean',
     ];
 
+    protected static function booted()
+    {
+        static::addGlobalScope('noBusinessFilter', function ($builder) {
+            // No business filtering for customers
+        });
+    }
+
     public function sales(): HasMany
     {
         return $this->hasMany(Sale::class);

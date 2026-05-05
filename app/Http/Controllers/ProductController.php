@@ -18,14 +18,9 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $outletId   = session('outlet_id', 1);
         $businessId = session('business_id');
 
-        $query = Product::with([
-                'category',
-                'prices' => fn($q) => $q->where('outlet_id', $outletId),
-                'stocks'  => fn($q) => $q->where('outlet_id', $outletId),
-            ])
+        $query = Product::with(['category', 'prices', 'stocks'])
             ->when($request->filled('search'), fn($q) => $q
                 ->where(fn($sub) => $sub
                     ->where('name', 'like', '%'.$request->search.'%')
@@ -37,7 +32,7 @@ class ProductController extends Controller
             ->when($request->filled('is_active'),   fn($q) => $q->where('is_active', $request->is_active));
 
         $products   = $query->orderBy('name')->paginate(25);
-        $categories = Category::get();
+        $categories = Category::all();
 
         return view('products.index', compact('products', 'categories'));
     }
@@ -57,7 +52,6 @@ class ProductController extends Controller
     public function store(StoreProductRequest $request)
     {
         $validated = $request->validated();
-        $outletId = session('outlet_id', 1);
 
         $buyPrice  = $validated['buy_price'] ?? 0;
         $sellPrice = $validated['sell_price'] ?? 0;
@@ -72,13 +66,11 @@ class ProductController extends Controller
         }
 
         $product->prices()->create([
-            'outlet_id'  => $outletId,
             'buy_price'  => $buyPrice,
             'sell_price' => $sellPrice,
         ]);
 
         $product->stocks()->create([
-            'outlet_id' => $outletId,
             'qty'       => 0,
             'min_qty'   => $validated['min_stock'] ?? 0,
         ]);
@@ -91,11 +83,10 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        $outletId = session('outlet_id', 1);
         $product->load([
             'category',
-            'prices' => fn($q) => $q->where('outlet_id', $outletId),
-            'stocks' => fn($q) => $q->where('outlet_id', $outletId),
+            'prices',
+            'stocks',
             'variants',
             'saleItems'
         ]);
@@ -105,10 +96,9 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         $this->authorize('update', $product);
-        $outletId = session('outlet_id', 1);
         $product->load([
-            'prices' => fn($q) => $q->where('outlet_id', $outletId),
-            'stocks' => fn($q) => $q->where('outlet_id', $outletId),
+            'prices',
+            'stocks',
         ]);
         $categories = Category::all();
         return view('products.edit', compact('product', 'categories'));
@@ -128,14 +118,14 @@ class ProductController extends Controller
 
         $product->update($validated);
 
-        // Update prices for current outlet if provided
+        // Update prices if provided
         if ($buyPrice !== null || $sellPrice !== null) {
             $updateData = [];
             if ($buyPrice !== null) $updateData['buy_price'] = $buyPrice;
             if ($sellPrice !== null) $updateData['sell_price'] = $sellPrice;
 
             $product->prices()->updateOrCreate(
-                ['outlet_id' => session('outlet_id', 1)],
+                [],
                 $updateData
             );
         }
@@ -170,11 +160,8 @@ class ProductController extends Controller
         ]);
 
         $query = $request->get('q');
-        $outletId = session('outlet_id', 1);
 
-        $products = Product::with(['category', 'prices' => function($q) use ($outletId) {
-                $q->where('outlet_id', $outletId);
-            }])
+        $products = Product::with(['category', 'prices'])
             ->where('is_active', true)
             ->where('is_pos_visible', true)
             ->when($query, function ($q) use ($query) {
@@ -212,8 +199,7 @@ class ProductController extends Controller
             'file' => 'required|mimes:xlsx,csv,ods',
         ]);
 
-        $outletId = session('outlet_id', 1);
-        Excel::import(new ProductsImport($outletId), $request->file('file'));
+        Excel::import(new ProductsImport, $request->file('file'));
 
         return back()->with('success', 'Produk berhasil diimport');
     }

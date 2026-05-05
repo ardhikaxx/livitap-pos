@@ -16,14 +16,13 @@ class ReceiptService
             'items.product', 
             'payments', 
             'customer', 
-            'user', 
-            'outlet.business'
+            'user'
         ]);
 
         $data = [
             'sale' => $sale,
-            'outlet' => $sale->outlet,
-            'business' => $sale->outlet->business,
+            'outlet' => null,
+            'business' => null,
         ];
 
         $pdf = PDF::loadView('pos.receipt', $data);
@@ -36,14 +35,14 @@ class ReceiptService
      */
     public function generateThermalData(Sale $sale)
     {
-        $sale->load(['items.product', 'outlet.business']);
+        $sale->load(['items.product']);
         
         return [
             'header' => [
-                'business_name' => $sale->outlet->business->name,
-                'business_address' => $sale->outlet->business->address,
-                'business_phone' => $sale->outlet->business->phone,
-                'outlet_name' => $sale->outlet->name,
+                'business_name' => session('business_name', 'LIVITAP POS'),
+                'business_address' => session('business_address', ''),
+                'business_phone' => session('business_phone', ''),
+                'outlet_name' => '',
                 'invoice_number' => $sale->invoice_number,
                 'date' => $sale->sale_date->format('d/m/Y H:i'),
                 'cashier' => $sale->user->name,

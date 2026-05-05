@@ -23,7 +23,6 @@ class StoreSaleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'outlet_id' => 'required|exists:outlets,id',
             'customer_id' => 'nullable|exists:customers,id',
             'table_id' => 'nullable|exists:tables,id',
             'order_type' => 'nullable|in:dine_in,takeaway,delivery',

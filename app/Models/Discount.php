@@ -12,8 +12,9 @@ class Discount extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'business_id', 'name', 'type', 'value', 'min_purchase', 'max_discount',
-        'applies_to', 'target_ids', 'start_date', 'end_date', 'usage_limit', 'used_count', 'is_active'
+        'name', 'type', 'value', 'min_purchase', 'max_discount',
+        'applies_to', 'target_ids', 'start_date', 'end_date',
+        'usage_limit', 'used_count', 'is_active'
     ];
 
     protected $casts = [

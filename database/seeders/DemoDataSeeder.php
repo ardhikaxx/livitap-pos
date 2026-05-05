@@ -68,50 +68,37 @@ class DemoDataSeeder extends Seeder
             ]
         );
 
-        // Create demo products
-        $foodCategory = Category::where('slug', 'food')->first();
-        $drinkCategory = Category::where('slug', 'drink')->first();
-        $snackCategory = Category::where('slug', 'snack')->first();
-        $dailyCategory = Category::where('slug', 'daily')->first();
-
-        $products = [
-            ['Nasi Goreng', 'NASG001', $foodCategory->id, 15000],
-            ['Mie Ayam', 'MIEA001', $foodCategory->id, 12000],
-            ['Es Teh', 'ESTE001', $drinkCategory->id, 5000],
-            ['Kopi Susu', 'KOPI001', $drinkCategory->id, 18000],
-            ['Keripik Kentang', 'KENT001', $snackCategory->id, 8000],
-            ['Sabun Mandi', 'SABU001', $dailyCategory->id, 12000],
+        // Add Cafe Products
+        $cafeCategories = [
+            'Coffee' => ['Espresso', 'Americano', 'Latte', 'Cappuccino'],
+            'Non-Coffee' => ['Matcha Latte', 'Chocolate', 'Red Velvet'],
+            'Snacks' => ['Croissant', 'Brownies', 'French Fries'],
         ];
 
-        foreach ($products as $productData) {
-            $product = Product::firstOrCreate(
-                ['sku' => $productData[1]],
-                [
-                    'category_id' => $productData[2],
-                    'name' => $productData[0],
-                    'slug' => strtolower(str_replace(' ', '-', $productData[0])),
-                    'sku' => $productData[1],
-                    'unit' => 'pcs',
-                    'track_stock' => true,
-                    'is_active' => true,
-                    'is_pos_visible' => true,
-                ]
-            );
+        foreach ($cafeCategories as $catName => $products) {
+            $category = Category::firstOrCreate([
+                'name' => $catName,
+                'slug' => strtolower(str_replace(' ', '-', $catName)),
+            ]);
 
-            // Create product price for outlet
-            ProductPrice::firstOrCreate(
-                ['product_id' => $product->id, 'outlet_id' => $outlet->id],
-                [
-                    'buy_price' => $productData[3] * 0.6, // HPP 60% dari harga jual
-                    'sell_price' => $productData[3],
-                ]
-            );
+            foreach ($products as $prodName) {
+                $product = Product::updateOrCreate(
+                    ['name' => $prodName],
+                    [
+                        'category_id' => $category->id,
+                        'slug' => strtolower(str_replace(' ', '-', $prodName)),
+                        'sku' => strtoupper(str_random(6)),
+                        'is_active' => true,
+                        'is_pos_visible' => true,
+                        'track_stock' => true
+                    ]
+                );
 
-            // Create stock
-            $product->stocks()->firstOrCreate(
-                ['outlet_id' => $outlet->id],
-                ['qty' => 100, 'min_qty' => 10]
-            );
+                ProductPrice::updateOrCreate(
+                    ['product_id' => $product->id],
+                    ['sell_price' => rand(15000, 45000), 'buy_price' => rand(5000, 20000)]
+                );
+            }
         }
 
         // Assign outlet to all super-admin users

@@ -14,12 +14,10 @@ class ShiftController extends Controller
 
     public function open(Request $request)
     {
-        $outletId = session('outlet_id', 1);
         $user = auth()->user();
         
         // Check if already open
         $existing = Shift::where('user_id', $user->id)
-            ->where('outlet_id', $outletId)
             ->where('status', 'open')
             ->first();
 
@@ -27,7 +25,7 @@ class ShiftController extends Controller
             return back()->with('error', 'Shift sudah dibuka');
         }
 
-        $this->shiftService->openShift($user, $request->opening_cash ?? 0, $outletId);
+        $this->shiftService->openShift($user, $request->opening_cash ?? 0);
 
         return redirect()->route('dashboard')->with('success', 'Shift berhasil dibuka');
     }

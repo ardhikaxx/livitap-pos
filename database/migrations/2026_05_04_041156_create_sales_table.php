@@ -13,14 +13,13 @@ return new class extends Migration
     {
         Schema::create('sales', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->unsignedBigInteger('outlet_id');
             $table->uuid('user_id');
             $table->unsignedBigInteger('customer_id')->nullable();
             $table->unsignedBigInteger('shift_id')->nullable();
             $table->unsignedBigInteger('table_id')->nullable();
             $table->string('invoice_number')->unique();
             $table->enum('type', ['sale', 'refund'])->default('sale');
-            $table->enum('status', ['paid', 'partial', 'unpaid', 'void'])->default('paid');
+            $table->enum('status', ['paid', 'partial', 'unpaid', 'void', 'pending', 'refunded'])->default('unpaid');
             $table->enum('order_type', ['dine_in', 'takeaway', 'delivery'])->default('takeaway');
             $table->dateTime('sale_date');
             $table->decimal('subtotal', 15, 2);
@@ -33,7 +32,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->index(['outlet_id', 'sale_date']);
+            $table->index('sale_date');
             $table->index('customer_id');
             $table->index('status');
         });

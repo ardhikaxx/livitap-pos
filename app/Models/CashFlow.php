@@ -8,17 +8,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class CashFlow extends Model
 {
     protected $fillable = [
-        'outlet_id', 'shift_id', 'user_id', 'type', 'amount', 'category', 'description'
+        'shift_id', 'user_id', 'type', 'amount', 'category', 'description'
     ];
 
     protected $casts = [
         'amount' => 'decimal:2',
     ];
-
-    public function outlet(): BelongsTo
-    {
-        return $this->belongsTo(Outlet::class);
-    }
 
     public function shift(): BelongsTo
     {

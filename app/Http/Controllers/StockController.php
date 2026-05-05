@@ -15,10 +15,7 @@ class StockController extends Controller
 
     public function index(Request $request)
     {
-        $outletId = session('outlet_id', 1);
-        
-        $stocks = ProductStock::with(['product.category', 'outlet'])
-            ->where('outlet_id', $outletId)
+        $stocks = ProductStock::with(['product.category'])
             ->when($request->filled('search'), function ($q) use ($request) {
                 $q->whereHas('product', function ($sub) use ($request) {
                     $sub->where('name', 'like', '%'.$request->search.'%')
@@ -32,8 +29,7 @@ class StockController extends Controller
 
     public function adjust(Product $product)
     {
-        $outletId = session('outlet_id', 1);
-        $stock = $product->stocks()->where('outlet_id', $outletId)->first();
+        $stock = $product->stocks()->first();
         return view('stocks.adjust', compact('product', 'stock'));
     }
 
@@ -45,17 +41,14 @@ class StockController extends Controller
             'notes' => 'nullable|string|max:500',
         ]);
 
-        $outletId = session('outlet_id', 1);
-        
         $qtyChange = match ($request->action) {
             'add' => $request->qty,
             'subtract' => -$request->qty,
-            'set' => $request->qty - ($product->stocks()->where('outlet_id', $outletId)->first()?->qty ?? 0),
+            'set' => $request->qty - ($product->stocks()->first()?->qty ?? 0),
         };
 
         $this->stockService->adjustStock(
             $product->id,
-            $outletId,
             $qtyChange,
             'adjustment',
             auth()->id(),
@@ -68,7 +61,6 @@ class StockController extends Controller
     public function adjustStock(Request $request)
     {
         $request->validate([
-            'outlet_id' => 'required|exists:outlets,id',
             'product_id' => 'required|exists:products,id',
             'qty' => 'required|numeric',
             'type' => 'required|in:purchase,adjustment,transfer,return',
@@ -77,7 +69,6 @@ class StockController extends Controller
 
         $this->stockService->adjustStock(
             $request->product_id,
-            $request->outlet_id,
             $request->qty,
             $request->type,
             auth()->id(),
@@ -87,32 +78,9 @@ class StockController extends Controller
         return response()->json(['success' => true, 'message' => 'Stok berhasil diperbarui']);
     }
 
-    public function transferStock(Request $request)
-    {
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'from_outlet_id' => 'required|exists:outlets,id',
-            'to_outlet_id' => 'required|exists:outlets,id|different:from_outlet_id',
-            'qty' => 'required|numeric|min:1',
-            'notes' => 'nullable|string',
-        ]);
-
-        $this->stockService->transferStock(
-            $request->product_id,
-            $request->from_outlet_id,
-            $request->to_outlet_id,
-            $request->qty,
-            auth()->id(),
-            $request->notes
-        );
-
-        return response()->json(['success' => true, 'message' => 'Transfer stok berhasil']);
-    }
-
     public function opname(Request $request)
     {
         $request->validate([
-            'outlet_id' => 'required|exists:outlets,id',
             'items' => 'required|array',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.actual_qty' => 'required|numeric|min:0',
@@ -121,7 +89,6 @@ class StockController extends Controller
 
         $opname = DB::transaction(function () use ($request) {
             $opname = \App\Models\StockOpname::create([
-                'outlet_id' => $request->outlet_id,
                 'status' => 'open',
                 'opened_by' => auth()->id(),
                 'opened_at' => now(),
@@ -130,7 +97,6 @@ class StockController extends Controller
 
             foreach ($request->items as $item) {
                 $stock = ProductStock::where('product_id', $item['product_id'])
-                    ->where('outlet_id', $request->outlet_id)
                     ->first();
 
                 $opname->items()->create([
@@ -161,8 +127,7 @@ class StockController extends Controller
 
     public function lowStockAlert()
     {
-        $outletId = session('outlet_id', 1);
-        $lowStocks = $this->stockService->checkLowStock($outletId);
+        $lowStocks = $this->stockService->checkLowStock();
         
         return response()->json([
             'success' => true,

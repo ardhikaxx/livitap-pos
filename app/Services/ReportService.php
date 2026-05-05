@@ -15,15 +15,12 @@ class ReportService
     /**
      * Laporan penjualan berdasarkan periode
      */
-    public function salesReport($from, $to, $outletId = null, $userId = null)
+    public function salesReport($from, $to, $userId = null)
     {
         $query = Sale::with(['user', 'items.product'])
             ->whereBetween('sale_date', [$from, $to])
             ->where('status', 'paid');
 
-        if ($outletId) {
-            $query->where('outlet_id', $outletId);
-        }
         if ($userId) {
             $query->where('user_id', $userId);
         }
@@ -32,9 +29,7 @@ class ReportService
         
         $summaryQuery = Sale::whereBetween('sale_date', [$from, $to])
             ->where('status', 'paid');
-        if ($outletId) {
-            $summaryQuery->where('outlet_id', $outletId);
-        }
+
         if ($userId) {
             $summaryQuery->where('user_id', $userId);
         }
@@ -74,12 +69,9 @@ class ReportService
     /**
      * Laporan stok
      */
-    public function stockReport($outletId = null)
+    public function stockReport()
     {
-        $query = \App\Models\ProductStock::with(['product', 'outlet'])
-            ->when($outletId, function ($q) use ($outletId) {
-                return $q->where('outlet_id', $outletId);
-            });
+        $query = \App\Models\ProductStock::with(['product']);
 
         $stocks = $query->get();
         
@@ -92,9 +84,6 @@ class ReportService
         });
 
         $movements = StockMovement::with(['product', 'user'])
-            ->when($outletId, function ($q) use ($outletId) {
-                return $q->where('outlet_id', $outletId);
-            })
             ->whereDate('created_at', Carbon::today())
             ->get();
 
@@ -148,22 +137,19 @@ class ReportService
     /**
      * Dashboard summary untuk hari ini
      */
-    public function dashboardSummary($outletId, $date = null)
+    public function dashboardSummary($date = null)
     {
         $date = $date ?: Carbon::today();
         
-        $todaySales = Sale::where('outlet_id', $outletId)
-            ->whereDate('sale_date', $date)
+        $todaySales = Sale::whereDate('sale_date', $date)
             ->where('status', 'paid')
             ->get();
 
-        $yesterdaySales = Sale::where('outlet_id', $outletId)
-            ->whereDate('sale_date', Carbon::yesterday())
+        $yesterdaySales = Sale::whereDate('sale_date', Carbon::yesterday())
             ->where('status', 'paid')
             ->get();
 
-        $activeShift = Shift::where('outlet_id', $outletId)
-            ->where('status', 'open')
+        $activeShift = Shift::where('status', 'open')
             ->first();
 
         return [
@@ -174,15 +160,14 @@ class ReportService
                 ? (($todaySales->sum('total') - $yesterdaySales->sum('total')) / $yesterdaySales->sum('total')) * 100 
                 : 0,
             'active_shift' => $activeShift,
-            'top_product_today' => $this->getTopProductToday($outletId, $date),
+            'top_product_today' => $this->getTopProductToday($date),
         ];
     }
 
-    private function getTopProductToday($outletId, $date)
+    private function getTopProductToday($date)
     {
         return SaleItem::select('product_id', DB::raw('SUM(qty) as total_qty'))
             ->join('sales', 'sale_items.sale_id', '=', 'sales.id')
-            ->where('sales.outlet_id', $outletId)
             ->whereDate('sales.sale_date', $date)
             ->groupBy('product_id')
             ->orderByDesc('total_qty')

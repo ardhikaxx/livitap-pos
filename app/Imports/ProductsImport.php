@@ -45,14 +45,12 @@ class ProductsImport implements ToModel, WithHeadingRow
             'is_pos_visible' => true,
         ]);
 
-        // Create price if sell_price exists
-        if (isset($row['sell_price'])) {
-            $product->prices()->create([
-                'outlet_id' => $this->outletId,
-                'buy_price' => $row['buy_price'] ?? 0,
-                'sell_price' => $row['sell_price'],
-            ]);
-        }
+        // Always create price (with default 0 if not provided)
+        $product->prices()->create([
+            'outlet_id' => $this->outletId,
+            'buy_price' => $row['buy_price'] ?? 0,
+            'sell_price' => $row['sell_price'] ?? 0,
+        ]);
 
         return $product;
     }

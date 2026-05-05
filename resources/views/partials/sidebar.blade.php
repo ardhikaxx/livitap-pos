@@ -77,15 +77,9 @@
                 <small class="text-uppercase fw-bold text-secondary" style="font-size: 0.65rem; letter-spacing: 0.05em;">Sistem</small>
             </li>
             <li class="nav-item">
-                <a href="{{ route('settings.business') }}" class="nav-link {{ request()->routeIs('settings.business') ? 'active' : '' }}">
+                <a href="{{ route('settings.global') }}" class="nav-link {{ request()->routeIs('settings.global') ? 'active' : '' }}">
                     <i class="bi bi-gear"></i>
                     <span>Pengaturan</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ route('settings.receipt') }}" class="nav-link {{ request()->routeIs('settings.receipt') ? 'active' : '' }}">
-                    <i class="bi bi-receipt"></i>
-                    <span>Pengaturan Struk</span>
                 </a>
             </li>
             <li class="nav-item">

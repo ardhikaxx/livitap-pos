@@ -120,7 +120,7 @@
                         <span class="d-none d-sm-inline">{{ auth()->user()->name ?? 'User' }}</span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
-                        <li><a class="dropdown-item py-2" href="{{ route('settings.business') }}"><i class="bi bi-person me-2"></i> Profil</a></li>
+                        <li><a class="dropdown-item py-2" href="{{ route('settings.global') }}"><i class="bi bi-person me-2"></i> Pengaturan</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <form method="POST" action="{{ route('logout') }}">

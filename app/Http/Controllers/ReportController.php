@@ -7,6 +7,8 @@ use App\Models\Product;
 use App\Models\StockMovement;
 use App\Models\Customer;
 use App\Services\ReportService;
+use App\Exports\SalesExport;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -60,11 +62,6 @@ class ReportController extends Controller
 
         return view('reports.stock', $report);
     }
-
-use App\Exports\SalesExport;
-use Maatwebsite\Excel\Facades\Excel;
-
-// ...
 
     public function export(Request $request)
     {

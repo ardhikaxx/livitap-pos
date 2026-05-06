@@ -68,9 +68,10 @@
 
         <div id="pos-cart-items" class="flex-grow-1 p-4 overflow-y-auto">
             <div class="empty-state text-center py-5">
-                <i class="bi bi-cart3 display-4 text-light mb-3"></i>
-                <p class="text-muted">Keranjang masih kosong</p>
-            </div>
+                    <i class="bi bi-basket3 text-primary opacity-50 mb-3" style="font-size: 5rem;"></i>
+                    <p class="text-muted fw-semibold">Keranjang masih kosong</p>
+                    <p class="text-muted small">Pilih produk untuk mulai transaksi</p>
+                </div>
         </div>
 
         <div class="p-4 bg-light bg-opacity-50">
@@ -82,7 +83,7 @@
                 <span class="text-dark fw-bold fs-5">Total Bayar</span>
                 <span class="text-primary fw-bold fs-5 text-end">Rp 0</span>
             </div>
-            <button id="checkout-btn" class="btn btn-primary btn-lg w-100 py-3 rounded-4 shadow-sm fw-bold">
+            <button id="checkout-btn" class="btn btn-primary btn-md w-100 py-2 rounded-4 fw-bold shadow-sm">
                 Proses Pembayaran <i class="bi bi-chevron-right ms-2"></i>
             </button>
         </div>
@@ -181,6 +182,9 @@
     .item-card:hover .item-hover-btn { opacity: 1; transform: scale(1); }
 
     /* Cart Sidebar Items */
+    #pos-cart { width: 400px; border-left: 1px solid #e0e0e0; height: 100vh; overflow-y: hidden; }
+    #pos-cart-items { flex-grow: 1; overflow-y: auto; max-height: calc(100vh - 250px); }
+    
     .cart-item-row { background: #f8fafc; border-radius: 16px; padding: 14px; border: 1px solid #f1f5f9; transition: 0.2s; }
     .cart-item-row:hover { background: white; border-color: #2563eb; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
     
@@ -197,7 +201,37 @@
 
 @push('scripts')
 <script>
-    let cart = [];
+    // Search functionality
+    document.getElementById('product-search').addEventListener('input', function(e) {
+        const query = e.target.value.toLowerCase();
+        filterProducts(query, document.querySelector('.category-item.active').innerText);
+    });
+
+    // Category filter functionality
+    document.querySelectorAll('.category-item').forEach(button => {
+        button.addEventListener('click', function() {
+            document.querySelectorAll('.category-item').forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            const query = document.getElementById('product-search').value.toLowerCase();
+            filterProducts(query, this.innerText);
+        });
+    });
+
+    function filterProducts(query, category) {
+        document.querySelectorAll('.col').forEach(col => {
+            const card = col.querySelector('.item-card');
+            if (!card) return;
+            
+            const name = card.dataset.name.toLowerCase();
+            const prodCategory = card.querySelector('.item-badge').innerText.trim();
+            
+            const matchesQuery = name.includes(query);
+            const matchesCategory = (category === 'Semua Menu' || prodCategory === category);
+            
+            col.style.display = (matchesQuery && matchesCategory) ? '' : 'none';
+        });
+    }
 
     // Global click handler for efficiency
     document.addEventListener('click', function(e) {

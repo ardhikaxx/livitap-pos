@@ -61,32 +61,27 @@ class ReportController extends Controller
         return view('reports.stock', $report);
     }
 
+use App\Exports\SalesExport;
+use Maatwebsite\Excel\Facades\Excel;
+
+// ...
+
     public function export(Request $request)
     {
         $request->validate([
             'type' => 'required|in:pdf,excel',
             'report' => 'required|in:sales,products,stock',
-            'date_from' => 'nullable|date',
-            'date_to' => 'nullable|date',
         ]);
 
-        $reportType = $request->report;
-        $data = [];
+        $from = $request->date_from ? \Carbon\Carbon::parse($request->date_from) : null;
+        $to = $request->date_to ? \Carbon\Carbon::parse($request->date_to) : null;
+        $userId = $request->user_id;
 
-        switch ($reportType) {
-            case 'sales':
-                $from = $request->date_from ? \Carbon\Carbon::parse($request->date_from) : \Carbon\Carbon::today()->startOfMonth();
-                $to = $request->date_to ? \Carbon\Carbon::parse($request->date_to) : \Carbon\Carbon::today();
-                $report = $this->reportService->salesReport($from, $to);
-                $data = $report['sales'];
-                break;
-            case 'stock':
-                $report = $this->reportService->stockReport();
-                $data = $report['stocks'];
-                break;
+        if ($request->type === 'excel' && $request->report === 'sales') {
+            return Excel::download(new SalesExport($from, $to, $userId), 'laporan-penjualan-' . now()->format('Y-m-d') . '.xlsx');
         }
 
-        return back()->with('success', 'Export berhasil (demo)');
+        return back()->with('error', 'Fitur ekspor belum tersedia untuk format/laporan ini');
     }
 
     public function dashboard()

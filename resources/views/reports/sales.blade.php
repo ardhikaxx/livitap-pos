@@ -71,7 +71,17 @@
 <div class="card border-0 shadow-sm rounded-3">
     <div class="card-header bg-white border-0 p-4 pb-0 d-flex justify-content-between align-items-center">
         <h6 class="fw-bold mb-0">Daftar Transaksi Lengkap</h6>
-        <button class="btn btn-sm btn-light text-muted fw-bold"><i class="bi bi-download me-1"></i> Export Excel</button>
+        <form action="{{ route('reports.export') }}" method="POST">
+            @csrf
+            <input type="hidden" name="type" value="excel">
+            <input type="hidden" name="report" value="sales">
+            <input type="hidden" name="date_from" value="{{ request('date_from', $from->format('Y-m-d')) }}">
+            <input type="hidden" name="date_to" value="{{ request('date_to', $to->format('Y-m-d')) }}">
+            <input type="hidden" name="user_id" value="{{ request('user_id') }}">
+            <button type="submit" class="btn btn-sm btn-light text-muted fw-bold shadow-sm">
+                <i class="bi bi-file-earmark-spreadsheet me-1"></i> Export Excel
+            </button>
+        </form>
     </div>
     <div class="card-body p-4">
         <div class="table-responsive">

@@ -152,29 +152,69 @@
 
 @push('styles')
 <style>
+    /* Global POS Layout */
+    #pos-area { height: calc(100vh - 64px); background-color: #f8fafc; }
+    
+    /* Product Section */
     .category-pill {
-        border-radius: 2rem;
-        padding: 0.5rem 1.25rem;
+        border-radius: 12px;
+        padding: 0.6rem 1.5rem;
         font-weight: 600;
-        border: 1px solid #dee2e6;
+        font-size: 0.85rem;
+        border: 1px solid #e2e8f0;
         background: #fff;
+        color: #64748b;
+        transition: all 0.3s ease;
     }
     .category-pill.active {
         background: var(--primary-color);
         color: #fff;
         border-color: var(--primary-color);
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
     }
+    
     .product-card {
-        border: 1px solid #e9ecef;
-        border-radius: 1rem;
-        padding: 1rem;
-        transition: all 0.2s;
+        background: #fff;
+        border: 1px solid #f1f5f9;
+        border-radius: 20px;
+        padding: 1.25rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
     .product-card:hover {
-        box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
+        transform: translateY(-8px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         border-color: var(--primary-color);
     }
-    .price { color: var(--primary-color); font-weight: 700; }
+    .product-card .price { 
+        color: var(--primary-color); 
+        font-weight: 800; 
+        font-size: 1.1rem; 
+    }
+
+    /* Cart Section */
+    #pos-cart {
+        border-left: 1px solid #e2e8f0;
+        background: #ffffff;
+    }
+    .cart-item {
+        background: #f8fafc;
+        border-radius: 16px;
+        padding: 15px;
+        margin-bottom: 10px;
+        border: 1px solid #f1f5f9;
+    }
+    .btn-add-cart {
+        background: #eef2ff;
+        color: var(--primary-color);
+        border: none;
+        transition: all 0.2s;
+    }
+    .btn-add-cart:hover {
+        background: var(--primary-color);
+        color: #fff;
+    }
 </style>
 @endpush
 @push('scripts')

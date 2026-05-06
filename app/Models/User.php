@@ -10,12 +10,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use App\Traits\HasPrimaryOutlet;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, HasRoles, HasUuids, HasPrimaryOutlet;
+    use HasFactory, Notifiable, HasRoles, HasUuids;
 
     protected $fillable = [
         'name', 'email', 'password', 'phone', 'photo', 'is_active', 'last_login_at'
@@ -38,10 +37,5 @@ class User extends Authenticatable
     public function business(): BelongsTo
     {
         return $this->belongsTo(Business::class);
-    }
-
-    public function outlets(): BelongsToMany
-    {
-        return $this->belongsToMany(Outlet::class, 'outlet_user', 'user_id', 'outlet_id');
     }
 }

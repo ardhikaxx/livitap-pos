@@ -1,12 +1,10 @@
 <?php
 
 namespace App\Services;
-
 use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Models\ProductStock;
 use App\Models\StockMovement;
-use App\Models\Shift;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -31,44 +29,11 @@ class SaleService
                 throw new \Exception("User tidak terautentikasi");
             }
 
-            // Get active shift
-            $shift = Shift::where('user_id', $user->id)
-                ->where('status', 'open')
-                ->first();
-
-            // Calculate totals
-            $subtotal = 0;
-            foreach ($data['items'] as $item) {
-                $subtotal += $item['price'] * $item['qty'];
-            }
-
-            $discountAmount = $data['discount_amount'] ?? 0;
-            $taxAmount = $data['tax_amount'] ?? 0;
-            $total = $subtotal - $discountAmount + $taxAmount;
-
-            if ($total < 0) {
-                throw new \Exception("Total transaksi tidak boleh negatif");
-            }
-
-            // Generate invoice number
-            $invoiceNumber = 'INV-' . Carbon::now()->format('Ymd') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
-
-            // Process Customer
-            $customerId = $data['customer_id'] ?? null;
-            if (!$customerId && isset($data['customer_name'])) {
-                $customer = \App\Models\Customer::firstOrCreate(
-                    ['name' => $data['customer_name']],
-                    ['name' => $data['customer_name']]
-                );
-                $customerId = $customer->id;
-            }
-
             // Create Sale
             $sale = Sale::create([
                 'id' => Str::uuid(),
                 'user_id' => $user->id,
                 'customer_id' => $customerId,
-                'shift_id' => $shift?->id,
                 'invoice_number' => $invoiceNumber,
                 'sale_date' => now(),
                 'subtotal' => $subtotal,
@@ -173,23 +138,6 @@ class SaleService
     {
         if ($sale->status === Sale::STATUS_VOID) {
             throw new \Exception("Transaksi sudah di-void");
-        }
-
-        // Cek shift policy
-        $shift = $sale->shift;
-        if ($shift && $shift->status !== 'open') {
-            if (!Auth::check()) {
-                throw new \Exception("Hanya Manager/Owner yang bisa void transaksi di shift yang sudah tutup");
-            }
-
-            $user = Auth::user();
-            
-            // Bypass Spatie trait methods and use direct relationship
-            $hasPermission = $user->roles()->whereIn('name', ['manager', 'owner', 'super-admin', 'Owner'])->exists();
-            
-            if (!$hasPermission) {
-                throw new \Exception("Hanya Manager/Owner yang bisa void transaksi di shift yang sudah tutup");
-            }
         }
 
         return DB::transaction(function () use ($sale, $reason, $userId) {

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class ActivityLog extends Model
 {
     protected $fillable = [
-        'user_id', 'outlet_id', 'action', 'model_type', 'model_id', 'old_values', 'new_values', 'ip_address', 'user_agent'
+        'user_id', 'action', 'model_type', 'model_id', 'old_values', 'new_values', 'ip_address', 'user_agent'
     ];
 
     protected $casts = [
@@ -24,10 +24,5 @@ class ActivityLog extends Model
     public function business(): BelongsTo
     {
         return $this->belongsTo(Business::class);
-    }
-
-    public function outlet(): BelongsTo
-    {
-        return $this->belongsTo(Outlet::class);
     }
 }

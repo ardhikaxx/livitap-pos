@@ -15,13 +15,9 @@ class CashFlow extends Model
         'amount' => 'decimal:2',
     ];
 
-    public function shift(): BelongsTo
+    public function business(): BelongsTo
     {
-        return $this->belongsTo(Shift::class);
+        return $this->belongsTo(Business::class);
     }
 
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
 }

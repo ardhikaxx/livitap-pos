@@ -20,11 +20,6 @@ class Business extends Model
         'is_active' => 'boolean',
     ];
 
-    public function outlets(): HasMany
-    {
-        return $this->hasMany(Outlet::class);
-    }
-
     public function categories(): HasMany
     {
         return $this->hasMany(Category::class);

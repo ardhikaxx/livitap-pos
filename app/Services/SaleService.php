@@ -29,6 +29,33 @@ class SaleService
                 throw new \Exception("User tidak terautentikasi");
             }
 
+            // Calculate totals
+            $subtotal = 0;
+            foreach ($data['items'] as $item) {
+                $subtotal += $item['price'] * $item['qty'];
+            }
+
+            $discountAmount = $data['discount_amount'] ?? 0;
+            $taxAmount = $data['tax_amount'] ?? 0;
+            $total = $subtotal - $discountAmount + $taxAmount;
+
+            if ($total < 0) {
+                throw new \Exception("Total transaksi tidak boleh negatif");
+            }
+
+            // Generate invoice number
+            $invoiceNumber = 'INV-' . Carbon::now()->format('Ymd') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
+
+            // Process Customer
+            $customerId = $data['customer_id'] ?? null;
+            if (!$customerId && isset($data['customer_name'])) {
+                $customer = \App\Models\Customer::firstOrCreate(
+                    ['name' => $data['customer_name']],
+                    ['name' => $data['customer_name']]
+                );
+                $customerId = $customer->id;
+            }
+
             // Create Sale
             $sale = Sale::create([
                 'id' => Str::uuid(),

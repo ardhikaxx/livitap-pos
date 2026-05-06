@@ -5,145 +5,155 @@
 @endsection
 
 @section('full_content')
-<div id="pos-area" class="d-flex" style="height: calc(100vh - 64px);">
+<div id="pos-area" class="d-flex" style="height: calc(100vh - 64px); background-color: #f9fafb;">
     <!-- Products Section -->
-    <div id="pos-products" class="flex-grow-1 p-4 bg-light overflow-y-auto">
-        <!-- Search & Categories -->
-        <div class="d-flex gap-3 align-items-center mb-4">
-            <div class="input-group shadow-sm" style="max-width: 400px;">
-                <span class="input-group-text bg-white border-0"><i class="bi bi-search text-primary"></i></span>
-                <input type="text" id="product-search" class="form-control border-0" placeholder="Cari produk...">
+    <div id="pos-products" class="flex-grow-1 p-4 overflow-y-auto">
+        <!-- Minimalist Header -->
+        <div class="row g-3 mb-4 align-items-center">
+            <div class="col-md-5">
+                <div class="input-group input-group-lg search-container shadow-sm border rounded-4 overflow-hidden bg-white">
+                    <span class="input-group-text border-0 bg-white ps-3"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" id="product-search" class="form-control border-0 fs-6 ps-2" placeholder="Cari menu atau produk...">
+                </div>
             </div>
-            <div class="d-flex gap-2 overflow-x-auto pb-2 flex-grow-1">
-                <button class="btn category-pill active">Semua</button>
-                @foreach($categories as $category)
-                    <button class="btn category-pill">{{ $category->name }}</button>
-                @endforeach
+            <div class="col-md-7">
+                <div class="category-nav d-flex gap-2 overflow-x-auto pb-1">
+                    <button class="btn category-item active">Semua Menu</button>
+                    @foreach($categories as $category)
+                        <button class="btn category-item">{{ $category->name }}</button>
+                    @endforeach
+                </div>
             </div>
         </div>
 
-        <!-- Product Grid -->
-        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+        <!-- Clean Product Grid -->
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
             @forelse($products as $product)
                 <div class="col">
-                    <div class="product-card">
-                        <div class="text-center mb-2">
-                             <div class="rounded bg-light d-flex align-items-center justify-content-center" style="height: 100px;">
-                                <i class="bi bi-box-seam fs-1 text-secondary opacity-50"></i>
-                             </div>
+                    <div class="item-card add-to-cart" 
+                         data-id="{{ $product->id }}" 
+                         data-name="{{ $product->name }}" 
+                         data-price="{{ $product->defaultPrice?->sell_price ?? ($product->prices->first()?->sell_price ?? 0) }}">
+                        <div class="item-badge">{{ $product->category->name ?? 'Umum' }}</div>
+                        <div class="item-visual">
+                            <i class="bi bi-box-seam"></i>
                         </div>
-                        <div>
-                            <h6 class="fw-bold mb-1 text-truncate">{{ $product->name }}</h6>
-                            <p class="text-muted small mb-2">{{ $product->category->name ?? '-' }}</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="price">Rp {{ number_format($product->defaultPrice?->sell_price ?? ($product->prices->first()?->sell_price ?? 0), 0) }}</span>
-                                <button class="btn btn-sm btn-primary rounded-pill px-3 add-to-cart" 
-                                        data-id="{{ $product->id }}" 
-                                        data-name="{{ $product->name }}" 
-                                        data-price="{{ $product->defaultPrice?->sell_price ?? ($product->prices->first()?->sell_price ?? 0) }}">
-                                    <i class="bi bi-plus-lg"></i>
-                                </button>
-                            </div>
+                        <div class="item-body">
+                            <h6 class="item-name">{{ $product->name }}</h6>
+                            <div class="item-price">Rp {{ number_format($product->defaultPrice?->sell_price ?? ($product->prices->first()?->sell_price ?? 0), 0) }}</div>
+                        </div>
+                        <div class="item-hover-btn">
+                            <i class="bi bi-plus-lg"></i>
                         </div>
                     </div>
                 </div>
             @empty
-                <div class="col-12 text-center py-5">
-                    <p class="text-muted">Tidak ada produk ditemukan.</p>
+                <div class="col-12 text-center py-5 opacity-50">
+                    <i class="bi bi-inbox display-1"></i>
+                    <p class="mt-3 fs-5">Produk tidak tersedia</p>
                 </div>
             @endforelse
         </div>
     </div>
 
-    <!-- Cart Section -->
-    <div id="pos-cart" class="d-flex flex-column bg-white shadow-lg" style="width: 380px; z-index: 10;">
-        <div class="p-3 border-bottom d-flex align-items-center justify-content-between">
-            <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-cart3 me-2"></i>Keranjang</h6>
-            <span class="badge bg-primary rounded-pill" id="cart-count">0</span>
-        </div>
-
-        <div id="pos-cart-items" class="flex-grow-1 p-3">
-            <!-- Cart Items -->
-            <div class="text-center text-muted py-5 mt-5">
-                <i class="bi bi-cart-x fs-1 opacity-25"></i>
-                <p>Keranjang kosong</p>
+    <!-- Minimalist Cart Sidebar -->
+    <div id="pos-cart" class="bg-white border-start d-flex flex-column" style="width: 400px;">
+        <div class="p-4 border-bottom">
+            <h5 class="fw-bold mb-1">Daftar Pesanan</h5>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-primary-subtle text-primary rounded-pill px-3" id="cart-count">0 Items</span>
+                <span class="text-muted small">#{{ date('dmYHi') }}</span>
             </div>
         </div>
 
-        <!-- Footer Actions -->
-        <div class="p-4 border-top bg-light">
-            <div class="d-flex justify-content-between mb-2">
+        <div id="pos-cart-items" class="flex-grow-1 p-4 overflow-y-auto">
+            <div class="empty-state text-center py-5">
+                <i class="bi bi-cart3 display-4 text-light mb-3"></i>
+                <p class="text-muted">Keranjang masih kosong</p>
+            </div>
+        </div>
+
+        <div class="p-4 bg-light bg-opacity-50">
+            <div class="summary-row d-flex justify-content-between mb-2">
                 <span class="text-muted">Subtotal</span>
-                <span class="fw-bold text-dark">Rp 0</span>
+                <span class="fw-semibold text-dark">Rp 0</span>
             </div>
-            <div class="d-flex justify-content-between mb-4">
-                <span class="fw-bold text-primary fs-5">Total</span>
-                <span class="fw-bold text-primary fs-5">Rp 0</span>
+            <div class="summary-row d-flex justify-content-between mb-4">
+                <span class="text-dark fw-bold fs-5">Total Bayar</span>
+                <span class="text-primary fw-bold fs-5 text-end">Rp 0</span>
             </div>
-            <div class="d-grid gap-2">
-                <button id="checkout-btn" class="btn btn-primary btn-lg fw-bold rounded-pill">Proses Pembayaran</button>
-            </div>
+            <button id="checkout-btn" class="btn btn-primary btn-lg w-100 py-3 rounded-4 shadow-sm fw-bold">
+                Proses Pembayaran <i class="bi bi-chevron-right ms-2"></i>
+            </button>
         </div>
     </div>
 </div>
 
-<!-- Modal Pembayaran -->
+<!-- Simple Modern Modal -->
 <div class="modal fade" id="paymentModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0 shadow">
+        <div class="modal-content border-0 shadow rounded-5 overflow-hidden">
+            <div class="modal-header border-0 p-4 pb-0">
+                <h5 class="modal-title fw-bold">Konfirmasi Transaksi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
             <div class="modal-body p-4">
-                <h5 class="fw-bold mb-4">Ringkasan Pembayaran</h5>
-                
-                <div class="mb-3">
-                    <label class="form-label small fw-bold text-muted">NAMA PELANGGAN</label>
-                    <input type="text" id="customer-name" class="form-control" placeholder="Opsional">
+                <div class="mb-4">
+                    <label class="form-label text-muted small fw-bold text-uppercase">Nama Pelanggan</label>
+                    <input type="text" id="customer-name" class="form-control form-control-lg border-0 bg-light rounded-4" placeholder="Cth: Budi">
                 </div>
 
-                <div class="row mb-3">
-                    <div class="col-6">
-                        <label class="form-label small fw-bold text-muted">TOTAL TAGIHAN</label>
-                        <h4 id="modal-total" class="fw-bold text-primary">Rp 0</h4>
-                    </div>
-                    <div class="col-6">
-                        <label class="form-label small fw-bold text-muted">METODE</label>
-                        <select id="payment-method" class="form-select">
-                            <option value="cash">Tunai</option>
-                            <option value="transfer">Transfer</option>
+                <div class="row g-3 mb-4">
+                    <div class="col-7">
+                        <label class="form-label text-muted small fw-bold text-uppercase">Metode Pembayaran</label>
+                        <select id="payment-method" class="form-select form-select-lg border-0 bg-light rounded-4">
+                            <option value="cash">Tunai (Cash)</option>
+                            <option value="transfer">Transfer Bank</option>
                         </select>
                     </div>
-                </div>
-
-                <div class="mb-4">
-                    <label class="form-label small fw-bold text-muted">NOMINAL DIBAYAR</label>
-                    <input type="number" id="paid-amount" class="form-control form-control-lg" placeholder="Masukkan jumlah uang...">
-                </div>
-
-                <div class="bg-light p-3 rounded-3 mb-4">
-                    <div class="d-flex justify-content-between">
-                        <span class="fw-bold text-muted">KEMBALIAN</span>
-                        <h4 id="change-amount" class="fw-bold text-success mb-0">Rp 0</h4>
+                    <div class="col-5">
+                        <label class="form-label text-muted small fw-bold text-uppercase text-end d-block">Tagihan</label>
+                        <h3 id="modal-total" class="fw-bold text-primary text-end">Rp 0</h3>
                     </div>
                 </div>
 
-                <div class="d-grid">
-                    <button id="confirm-payment" class="btn btn-primary btn-lg rounded-pill shadow">Selesaikan Transaksi</button>
+                <div class="mb-4 text-center">
+                    <label class="form-label text-muted small fw-bold text-uppercase d-block mb-3">Nominal Diterima</label>
+                    <div class="d-flex align-items-center justify-content-center bg-primary bg-opacity-10 p-3 rounded-5 mb-2">
+                        <span class="fs-4 fw-bold text-primary me-2">Rp</span>
+                        <input type="number" id="paid-amount" class="form-control border-0 bg-transparent fs-2 fw-bold text-primary p-0 w-75 text-center" placeholder="0">
+                    </div>
+                    <div class="small text-muted">Klik untuk menginput jumlah pembayaran</div>
                 </div>
+
+                <div class="bg-dark text-white p-3 rounded-4 d-flex justify-content-between align-items-center mb-4 shadow-sm">
+                    <span class="small opacity-75">KEMBALIAN</span>
+                    <h4 id="change-amount" class="fw-bold mb-0">Rp 0</h4>
+                </div>
+
+                <button id="confirm-payment" class="btn btn-primary btn-lg w-100 py-3 rounded-4 fw-bold shadow">
+                    Selesaikan Transaksi
+                </button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Modal Sukses -->
+<!-- Success Modal -->
 <div class="modal fade" id="successModal" tabindex="-1" data-bs-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0 shadow">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow-lg rounded-5 overflow-hidden">
             <div class="modal-body text-center p-5">
-                <div class="display-1 text-success mb-4"><i class="bi bi-check-circle-fill"></i></div>
-                <h3 class="fw-bold">Transaksi Berhasil!</h3>
-                <p id="receipt-summary" class="text-muted"></p>
-                <div class="d-grid gap-2 mt-4">
-                    <a id="print-receipt-link" href="#" target="_blank" class="btn btn-primary btn-lg rounded-pill">Cetak Struk</a>
-                    <button class="btn btn-light btn-lg rounded-pill" onclick="window.location.reload()">Transaksi Baru</button>
+                <div class="mb-4">
+                    <div class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm" style="width: 80px; height: 80px;">
+                        <i class="bi bi-check-lg fs-1"></i>
+                    </div>
+                </div>
+                <h4 class="fw-bold">Berhasil!</h4>
+                <p id="receipt-summary" class="text-muted small mb-4"></p>
+                <div class="d-grid gap-2">
+                    <a id="print-receipt-link" href="#" target="_blank" class="btn btn-primary rounded-4 py-2 fw-bold">Cetak Struk</a>
+                    <button class="btn btn-light rounded-4 py-2 border text-muted" onclick="window.location.reload()">Selesai</button>
                 </div>
             </div>
         </div>
@@ -152,81 +162,51 @@
 
 @push('styles')
 <style>
-    /* Global POS Layout */
-    #pos-area { height: calc(100vh - 64px); background-color: #f8fafc; }
+    /* Clean System Typography */
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; letter-spacing: -0.01em; }
     
-    /* Product Section */
-    .category-pill {
-        border-radius: 12px;
-        padding: 0.6rem 1.5rem;
-        font-weight: 600;
-        font-size: 0.85rem;
-        border: 1px solid #e2e8f0;
-        background: #fff;
-        color: #64748b;
-        transition: all 0.3s ease;
-    }
-    .category-pill.active {
-        background: var(--primary-color);
-        color: #fff;
-        border-color: var(--primary-color);
-        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
-    }
-    
-    .product-card {
-        background: #fff;
-        border: 1px solid #f1f5f9;
-        border-radius: 20px;
-        padding: 1.25rem;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        cursor: pointer;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    }
-    .product-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        border-color: var(--primary-color);
-    }
-    .product-card .price { 
-        color: var(--primary-color); 
-        font-weight: 800; 
-        font-size: 1.1rem; 
-    }
+    /* Category Navigation */
+    .category-item { border: none; background: white; color: #64748b; padding: 10px 24px; border-radius: 14px; font-weight: 600; white-space: nowrap; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+    .category-item:hover { background: #f1f5f9; color: #1e293b; }
+    .category-item.active { background: #2563eb; color: white; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3); }
 
-    /* Cart Section */
-    #pos-cart {
-        border-left: 1px solid #e2e8f0;
-        background: #ffffff;
-    }
-    .cart-item {
-        background: #f8fafc;
-        border-radius: 16px;
-        padding: 15px;
-        margin-bottom: 10px;
-        border: 1px solid #f1f5f9;
-    }
-    .btn-add-cart {
-        background: #eef2ff;
-        color: var(--primary-color);
-        border: none;
-        transition: all 0.2s;
-    }
-    .btn-add-cart:hover {
-        background: var(--primary-color);
-        color: #fff;
-    }
+    /* Modern Item Card */
+    .item-card { background: white; border-radius: 20px; padding: 16px; position: relative; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid #f1f5f9; cursor: pointer; height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+    .item-card:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important; border-color: #dbeafe; }
+    .item-badge { position: absolute; top: 12px; left: 12px; background: #f8fafc; color: #64748b; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; padding: 4px 10px; border-radius: 8px; z-index: 1; border: 1px solid #e2e8f0; }
+    .item-visual { height: 110px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: #cbd5e1; background: #f8fafc; border-radius: 14px; margin-bottom: 12px; }
+    .item-name { font-size: 0.95rem; font-weight: 700; color: #1e293b; line-height: 1.4; margin-bottom: 8px; height: 2.6rem; overflow: hidden; }
+    .item-price { font-size: 1.1rem; font-weight: 800; color: #2563eb; }
+    .item-hover-btn { position: absolute; bottom: 16px; right: 16px; background: #2563eb; color: white; width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: 0.2s; transform: scale(0.8); }
+    .item-card:hover .item-hover-btn { opacity: 1; transform: scale(1); }
+
+    /* Cart Sidebar Items */
+    .cart-item-row { background: #f8fafc; border-radius: 16px; padding: 14px; border: 1px solid #f1f5f9; transition: 0.2s; }
+    .cart-item-row:hover { background: white; border-color: #2563eb; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+
+    /* Form Controls */
+    .form-control:focus, .form-select:focus { outline: none; box-shadow: none; border-color: #2563eb; }
 </style>
 @endpush
+
 @push('scripts')
 <script>
     let cart = [];
 
-    document.querySelectorAll('.add-to-cart').forEach(button => {
-        button.addEventListener('click', function() {
+    // Global click handler for efficiency
+    document.addEventListener('click', function(e) {
+        const addToCartBtn = e.target.closest('.add-to-cart');
+        if (addToCartBtn) {
             const product = {
-                id: this.dataset.id,
-                name: this.dataset.name,
-                price: parseFloat(this.dataset.price),
+                id: addToCartBtn.dataset.id,
+                name: addToCartBtn.dataset.name,
+                price: parseFloat(addToCartBtn.dataset.price),
                 qty: 1
             };
 
@@ -237,7 +217,7 @@
                 cart.push(product);
             }
             updateCartUI();
-        });
+        }
     });
 
     function updateCartUI() {
@@ -246,36 +226,59 @@
         cartItems.innerHTML = '';
         let subtotal = 0;
 
-        cart.forEach(item => {
-            subtotal += item.price * item.qty;
-            cartItems.innerHTML += `
-                <div class="cart-item d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
-                    <div>
-                        <div class="fw-bold small">${item.name}</div>
-                        <div class="text-primary small">Rp ${item.price.toLocaleString()} x ${item.qty}</div>
-                    </div>
-                    <button class="btn btn-sm text-danger" onclick="removeItem('${item.id}')"><i class="bi bi-trash"></i></button>
+        if (cart.length === 0) {
+            cartItems.innerHTML = `
+                <div class="empty-state text-center py-5">
+                    <i class="bi bi-basket3 text-primary opacity-50 mb-3" style="font-size: 5rem;"></i>
+                    <p class="text-muted fw-semibold">Keranjang masih kosong</p>
+                    <p class="text-muted small">Pilih produk untuk mulai transaksi</p>
                 </div>
             `;
-        });
+        } else {
+            cart.forEach(item => {
+                subtotal += item.price * item.qty;
+                cartItems.innerHTML += `
+                    <div class="cart-item-row d-flex justify-content-between align-items-center mb-3">
+                        <div class="flex-grow-1 pe-2">
+                            <div class="fw-bold text-dark small mb-1">${item.name}</div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-white border text-primary rounded-pill">x${item.qty}</span>
+                                <span class="text-muted extra-small">@ ${item.price.toLocaleString()}</span>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="fw-bold text-dark small mb-2">Rp ${(item.price * item.qty).toLocaleString()}</div>
+                            <button class="btn btn-sm btn-link text-danger p-0" onclick="removeItem('${item.id}')">
+                                <i class="bi bi-trash3"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
 
-        cartCount.innerText = cart.length;
-        document.querySelectorAll('.p-4 .text-dark')[0].innerText = `Rp ${subtotal.toLocaleString()}`;
-        document.querySelectorAll('.p-4 .text-primary.fs-5')[1].innerText = `Rp ${subtotal.toLocaleString()}`;
+        cartCount.innerText = `${cart.length} Items`;
+        
+        const summaryPanel = document.querySelector('.summary-row').parentElement;
+        if (summaryPanel) {
+            summaryPanel.querySelectorAll('.fw-semibold')[0].innerText = `Rp ${subtotal.toLocaleString()}`;
+            summaryPanel.querySelectorAll('.text-primary.fw-bold')[0].innerText = `Rp ${subtotal.toLocaleString()}`;
+        }
     }
 
     function removeItem(id) {
         cart = cart.filter(item => item.id !== id);
         updateCartUI();
     }
+
     document.getElementById('checkout-btn').addEventListener('click', function() {
         if (cart.length === 0) {
-            alert('Keranjang kosong!');
+            alert('Pilih produk terlebih dahulu');
             return;
         }
         const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
         document.getElementById('modal-total').innerText = `Rp ${subtotal.toLocaleString()}`;
-        document.getElementById('paid-amount').value = ''; // Kosongkan input
+        document.getElementById('paid-amount').value = ''; 
         document.getElementById('change-amount').innerText = `Rp 0`;
         new bootstrap.Modal(document.getElementById('paymentModal')).show();
     });
@@ -288,11 +291,18 @@
     });
 
     document.getElementById('confirm-payment').addEventListener('click', function() {
-        const customerName = document.getElementById('customer-name').value;
-        const paymentMethod = document.getElementById('payment-method').value;
-        const paidAmount = parseFloat(document.getElementById('paid-amount').value);
         const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+        const paidAmount = parseFloat(document.getElementById('paid-amount').value);
+
+        if (!paidAmount || paidAmount < subtotal) {
+            alert('Nominal pembayaran kurang');
+            return;
+        }
         
+        const btn = this;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Sesaat...';
+
         fetch('{{ route('pos.store') }}', {
             method: 'POST',
             headers: {
@@ -306,21 +316,28 @@
                     price: item.price,
                     name: item.name
                 })),
-                customer_name: customerName,
-                payment_method: paymentMethod,
+                customer_name: document.getElementById('customer-name').value,
+                payment_method: document.getElementById('payment-method').value,
                 paid_amount: paidAmount
             })
         })
-        .then(response => response.json())
+        .then(res => res.json())
         .then(data => {
             if (data.success) {
                 bootstrap.Modal.getInstance(document.getElementById('paymentModal')).hide();
-                document.getElementById('receipt-summary').innerText = `Total Transaksi: Rp ${paidAmount.toLocaleString()}`;
+                document.getElementById('receipt-summary').innerText = `Total: Rp ${subtotal.toLocaleString()}`;
                 document.getElementById('print-receipt-link').href = `/pos/${data.data.id}/receipt`;
                 new bootstrap.Modal(document.getElementById('successModal')).show();
             } else {
-                alert(data.message || 'Terjadi kesalahan');
+                alert(data.message);
+                btn.disabled = false;
+                btn.innerHTML = 'Selesaikan Transaksi';
             }
+        })
+        .catch(() => {
+            alert('Error saat mengirim data');
+            btn.disabled = false;
+            btn.innerHTML = 'Selesaikan Transaksi';
         });
     });
 </script>

@@ -1,4 +1,4 @@
-# Livitap POS - Sistem Point of Sale untuk Usaha Retail
+﻿# Livitap POS - Sistem Point of Sale untuk Usaha Retail
 
 **Livitap POS** adalah sistem Point of Sale (POS) lengkap yang dirancang untuk_kedai, kafe, restoran, dan usaha retail_. Sistem ini menyediakan antarmuka yang cepat dan intuitif untuk mengelola transaksi, inventaris, laporan, dan operasi toko harian.
 
@@ -304,7 +304,7 @@ Jika project ini bermanfaat, Anda dapat mendukung pengembangan selanjutnya melal
 
 <div align="center">
 
-![QRIS](public/assets/qris.png)
+<img src="public/assets/qris.png" alt="QRIS" width="250" />
 
 **Scan QRIS di atas untuk berdonasi**
 
